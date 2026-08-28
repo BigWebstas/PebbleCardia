@@ -18,7 +18,8 @@
       "watchface": false
     },
     "capabilities": [
-      "health"
+      "health",
+      "configurable"
     ],
     "messageKeys": [
       "MSG_KIND",
