@@ -5,3 +5,6 @@
 
 # Node
 /node_modules/
+
+# scratch
+scratchpad_logs.txt

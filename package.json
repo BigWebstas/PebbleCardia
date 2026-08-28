@@ -34,7 +34,8 @@
       "EP_HR_PEAK",
       "EP_HR_MIN",
       "EP_SCORE",
-      "DBG_TRIGGER"
+      "DBG_TRIGGER",
+      "DUMP"
     ],
     "resources": {
       "media": [
