@@ -31,7 +31,9 @@ function stream(record) {
   try {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
+    // text/plain avoids a CORS pre-flight and is what Google Apps Script
+    // web apps accept; the body is still JSON (see tools/cardia-sheet-sync.gs).
+    xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
     xhr.onerror = function () { console.log('sync POST failed'); };
     xhr.send(JSON.stringify(record));
   } catch (e) { console.log('sync error ' + e); }
@@ -325,8 +327,10 @@ Pebble.addEventListener('showConfiguration', function () {
 '<button onclick="copyMd()">Copy Markdown</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear data</button>' +
 '</div>' +
-'<p>Live sync URL (optional — each sample &amp; episode is POSTed here as JSON):<br>' +
-'<input id="url" placeholder="https://…"><button onclick="done()">Save &amp; close</button></p>' +
+'<p>Live sync URL (optional) — every sample &amp; episode is POSTed here as JSON. ' +
+'A Google Apps Script that appends to a Sheet is in <code>tools/cardia-sheet-sync.gs</code>.<br>' +
+'<input id="url" placeholder="https://script.google.com/…/exec">' +
+'<button onclick="done()">Save &amp; close</button></p>' +
 '<div id="report">Rendering…</div><h2>Raw Markdown</h2><textarea id="raw"></textarea>' +
 '<script>' +
 'var MD=' + JSON.stringify(md) + ';' +
