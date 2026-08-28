@@ -1,0 +1,4 @@
+--------- beginning of system
+08-28 17:09:59.017 W/ActivityManager( 4220): Skipping manifest association check for null package. SourceUid: -1, SourcePkg: null, TargetUid: 10158, TargetPkg: com.google.android.projection.gearhead
+08-28 17:09:59.033 W/ActivityManager( 4220): Skipping manifest association check for null package. SourceUid: -1, SourcePkg: null, TargetUid: 10158, TargetPkg: com.google.android.projection.gearhead
+08-28 17:10:05.869 W/ActivityManager( 4220): Skipping manifest association check for null package. SourceUid: 10154, SourcePkg: null, TargetUid: 10154, TargetPkg: com.google.android.apps.messaging

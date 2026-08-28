@@ -347,71 +347,49 @@ Pebble.addEventListener('showConfiguration', function () {
 'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
 '</style></head><body>' +
 '<div class="bar">' +
-'<button onclick="copyMd()">Copy Markdown</button>' +
-'<a id="dmd" class="btn" target="_blank" rel="noopener" onclick="return openA(this)">Download .md</a>' +
-'<a id="djson" class="btn" target="_blank" rel="noopener" onclick="return openA(this)">Download .json</a>' +
+'<button onclick="cp(\'md\')">Copy report (Markdown)</button>' +
+'<button onclick="cp(\'json\')">Copy raw data (JSON)</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
-'<label>Export file name</label>' +
-'<input id="prefix" placeholder="cardia"> <span class="hint">&rarr; ' +
-'<span id="egname">cardia</span>-report-&lt;date&gt;.md</span>' +
-'<p class="hint"><b>Copy Markdown</b> copies the whole report — paste into ' +
-'Obsidian, a note, anywhere (most reliable). <b>Download</b> opens the file ' +
-'in a browser tab to save it.</p>' +
+'<p class="hint">This settings screen can\'t save files, so <b>copy</b> the ' +
+'report and paste it into a Markdown app (Joplin, Obsidian, Google Keep…). ' +
+'For automatic capture, set a sync URL below.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
 'Google Apps Script &rarr; Sheet: <code>tools/cardia-sheet-sync.gs</code>.</p>' +
 '<button onclick="done()">Save settings &amp; close</button>' +
-'<div id="report">Rendering…</div><h2>Raw Markdown</h2><textarea id="raw"></textarea>' +
+'<div id="report">Rendering…</div>' +
+'<h2>Text to copy</h2>' +
+'<textarea id="raw" onclick="this.select()"></textarea>' +
 '<script>' +
 'var MD=' + JSON.stringify(md) + ';' +
 'var JD=' + JSON.stringify(jsonData) + ';' +
 'var CFG=' + JSON.stringify(cfg) + ';' +
-'document.getElementById("raw").value=MD;' +
-'document.getElementById("url").value=CFG.syncUrl||"";' +
-'document.getElementById("prefix").value=CFG.filePrefix||"cardia";' +
-'function fname(kind){' +
-'  var p=(document.getElementById("prefix").value.trim()||"cardia").replace(/[^A-Za-z0-9_-]+/g,"-");' +
-'  var d=new Date(),z=function(n){return(n<10?"0":"")+n;};' +
-'  var s=d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());' +
-'  return kind==="json"?p+"-data-"+s+".json":p+"-report-"+s+".md";' +
+'var g=function(i){return document.getElementById(i);};' +
+'g("raw").value=MD;' +
+'g("url").value=CFG.syncUrl||"";' +
+'function note(t){g("msg").textContent=t;}' +
+'function cp(kind){' +
+'  var r=g("raw");r.value=(kind==="json"?JD:MD);r.focus();r.select();' +
+'  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
+'  var ok=false;try{ok=document.execCommand("copy");}catch(e){}' +
+'  note(ok?("Copied the "+kind.toUpperCase()+" — paste it into your notes app.")' +
+'         :"Couldn\'t auto-copy. The text is selected below — copy it manually.");' +
 '}' +
-'document.getElementById("prefix").oninput=function(){' +
-'  document.getElementById("egname").textContent=(this.value.trim()||"cardia");setDL();};' +
+'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
+'  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
+'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
+'  syncUrl:g("url").value.trim()}));}' +
 'try{' +
 '  mermaid.initialize({startOnLoad:false,theme:"neutral"});' +
 '  var html=marked.parse(MD);' +
 '  html=html.replace(/<pre><code class="language-mermaid[^"]*">([\\s\\S]*?)<\\/code><\\/pre>/g,' +
 '    function(_,c){return \'<pre class="mermaid">\'+c.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&quot;/g,\'"\')+\'</pre>\';});' +
-'  document.getElementById("report").innerHTML=html;' +
+'  g("report").innerHTML=html;' +
 '  mermaid.run();' +
-'}catch(e){document.getElementById("report").textContent="(preview failed: "+e+")";}' +
-'function note(t){var m=document.getElementById("msg");if(m){m.textContent=t;}}' +
-'function du(kind){' +
-'  var t=kind==="json"?JD:MD,m=kind==="json"?"application/json":"text/markdown";' +
-'  return "data:"+m+";charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(t)));' +
-'}' +
-'function setDL(){' +
-'  var a=document.getElementById("dmd"),b=document.getElementById("djson");' +
-'  a.href=du("md");a.setAttribute("download",fname("md"));' +
-'  b.href=du("json");b.setAttribute("download",fname("json"));' +
-'}' +
-'function openA(a){' +
-'  try{if(window.open(a.href,"_blank"))return false;}catch(e){}' +
-'  return true;' +   // fall through to the <a target=_blank> navigation
-'}' +
-'function copyMd(){var r=document.getElementById("raw");r.focus();r.select();' +
-'  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
-'  var ok=false;try{ok=document.execCommand("copy");}catch(e){}' +
-'  note(ok?"Copied to clipboard.":"Select the text below and copy it manually.");}' +
-'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
-'  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
-'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
-'  syncUrl:document.getElementById("url").value.trim(),' +
-'  filePrefix:document.getElementById("prefix").value.trim()}));}' +
-'setDL();' +
+'}catch(e){g("report").textContent="(preview failed: "+e+")";}' +
 '</script></body></html>';
 
   Pebble.openURL('data:text/html;charset=utf-8;base64,' +
@@ -430,8 +408,10 @@ Pebble.addEventListener('webviewclosed', function (e) {
     return;
   }
 
-  var cfg = getConfig();
-  if ('syncUrl' in r) cfg.syncUrl = r.syncUrl || '';
-  if ('filePrefix' in r) cfg.filePrefix = r.filePrefix || '';
-  save('config', cfg);
+  if ('syncUrl' in r) {
+    var cfg = getConfig();
+    cfg.syncUrl = r.syncUrl || '';
+    save('config', cfg);
+    console.log('sync URL ' + (cfg.syncUrl ? 'set' : 'cleared'));
+  }
 });

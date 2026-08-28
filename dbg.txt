@@ -22,3 +22,57 @@
 [17:06:59] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=142 pnn50=56 steps=808 mot=0
 [17:07:14] pkjs> Cardia:161:14 [sample] 86bpm Normal rmssd=92 pnn50=45 steps=808 mot=0
 [17:07:27] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
+[17:07:27] ocess_manager.c:487> Heap Usage for Worker <Cardia>: Total Size <4752B> Used <2116B> Still allocated <0B>
+[17:07:31] pkjs> Cardia:? Pebble JS Bridge initialized.
+[17:07:31] pkjs> Cardia:140:12 Cardia JS ready. samples=226 episodes=11
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787955969,"startISO":"2026-08-28T22:26:09.000Z","duration_s":36,"ongoing":false,"type":"Irregular","hr_min":87,"hr_peak":91,"score":82}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787955021,"startISO":"2026-08-28T22:10:21.000Z","duration_s":28,"ongoing":false,"type":"Irregular","hr_min":93,"hr_peak":93,"score":67}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787953510,"startISO":"2026-08-28T21:45:10.000Z","duration_s":52,"ongoing":false,"type":"Elevated","hr_min":120,"hr_peak":122,"score":25}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787953275,"startISO":"2026-08-28T21:41:15.000Z","duration_s":41,"ongoing":false,"type":"Elevated","hr_min":121,"hr_peak":122,"score":11}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787952914,"startISO":"2026-08-28T21:35:14.000Z","duration_s":327,"ongoing":false,"type":"Elevated","hr_min":120,"hr_peak":126,"score":36}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787950354,"startISO":"2026-08-28T20:52:34.000Z","duration_s":56,"ongoing":false,"type":"Irregular","hr_min":94,"hr_peak":94,"score":84}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787949595,"startISO":"2026-08-28T20:39:55.000Z","duration_s":20,"ongoing":false,"type":"Irregular","hr_min":79,"hr_peak":81,"score":91}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787949563,"startISO":"2026-08-28T20:39:23.000Z","duration_s":16,"ongoing":false,"type":"Irregular","hr_min":85,"hr_peak":86,"score":100}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787949492,"startISO":"2026-08-28T20:38:12.000Z","duration_s":15,"ongoing":false,"type":"Irregular","hr_min":88,"hr_peak":88,"score":100}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787948232,"startISO":"2026-08-28T20:17:12.000Z","duration_s":65,"ongoing":false,"type":"Irregular","hr_min":80,"hr_peak":90,"score":100}
+[17:07:31] pkjs> Cardia:182:14 [episode] {"start":1787948076,"startISO":"2026-08-28T20:14:36.000Z","duration_s":81,"ongoing":false,"type":"Irregular","hr_min":78,"hr_peak":81,"score":100}
+[17:07:46] pkjs> Cardia:161:14 [sample] 0bpm No signal rmssd=0 pnn50=0 steps=808 mot=0
+[17:08:02] pkjs> Cardia:161:14 [sample] 93bpm Normal rmssd=273 pnn50=60 steps=808 mot=0
+[17:08:18] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=236 pnn50=55 steps=808 mot=0
+[17:08:33] pkjs> Cardia:161:14 [sample] 88bpm Irregular rmssd=231 pnn50=54 steps=808 mot=0
+[17:08:49] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=229 pnn50=49 steps=808 mot=0
+[17:09:05] pkjs> Cardia:161:14 [sample] 85bpm Irregular rmssd=164 pnn50=42 steps=808 mot=0
+[17:09:20] pkjs> Cardia:161:14 [sample] 91bpm Normal rmssd=144 pnn50=26 steps=808 mot=0
+[17:09:35] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=97 pnn50=16 steps=808 mot=0
+[17:09:51] pkjs> Cardia:161:14 [sample] 86bpm Normal rmssd=21 pnn50=5 steps=808 mot=0
+[17:10:06] pkjs> Cardia:161:14 [sample] 90bpm Normal rmssd=16 pnn50=4 steps=808 mot=0
+[17:10:21] pkjs> Cardia:161:14 [sample] 83bpm Normal rmssd=18 pnn50=4 steps=808 mot=0
+[17:10:36] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=19 pnn50=4 steps=808 mot=0
+[17:10:52] pkjs> Cardia:161:14 [sample] 80bpm Normal rmssd=20 pnn50=5 steps=808 mot=0
+[17:11:07] pkjs> Cardia:161:14 [sample] 75bpm Normal rmssd=23 pnn50=7 steps=808 mot=0
+[17:11:22] pkjs> Cardia:161:14 [sample] 77bpm Normal rmssd=28 pnn50=10 steps=808 mot=0
+[17:11:38] pkjs> Cardia:161:14 [sample] 83bpm Normal rmssd=35 pnn50=17 steps=808 mot=0
+[17:11:54] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=37 pnn50=21 steps=808 mot=0
+[17:12:09] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=31 pnn50=11 steps=808 mot=0
+[17:12:24] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=31 pnn50=10 steps=808 mot=0
+[17:12:40] pkjs> Cardia:161:14 [sample] 82bpm Normal rmssd=28 pnn50=3 steps=808 mot=0
+[17:12:56] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=28 pnn50=3 steps=808 mot=0
+[17:13:11] pkjs> Cardia:161:14 [sample] 83bpm Normal rmssd=31 pnn50=5 steps=808 mot=0
+[17:13:27] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:13:42] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:13:58] pkjs> Cardia:161:14 [sample] 86bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:14:13] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:14:29] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:14:44] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:15:00] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:15:16] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:15:32] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:15:47] pkjs> Cardia:161:14 [sample] 83bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:16:03] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:16:18] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:16:34] pkjs> Cardia:161:14 [sample] 80bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:16:50] pkjs> Cardia:161:14 [sample] 80bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:17:06] pkjs> Cardia:161:14 [sample] 81bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:17:22] pkjs> Cardia:161:14 [sample] 83bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
+[17:17:25] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
+[17:17:25] ocess_manager.c:487> Heap Usage for Worker <Cardia>: Total Size <4752B> Used <2116B> Still allocated <0B>
