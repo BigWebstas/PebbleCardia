@@ -356,10 +356,10 @@ Pebble.addEventListener('showConfiguration', function () {
 '<label>Export file name</label>' +
 '<input id="prefix" placeholder="cardia"> <span class="hint">&rarr; ' +
 '<span id="egname">cardia</span>-report-&lt;date&gt;.md</span>' +
-'<p class="hint">A web page can\'t choose a save <i>folder</i> on Android — ' +
-'downloads go to your Downloads folder. Use <b>Share report</b> &rarr; ' +
-'<b>Save to Files</b> to put it in a specific folder (the picker remembers ' +
-'the last one you used).</p>' +
+'<p class="hint"><b>Share report</b> opens the Android share sheet (send to ' +
+'Obsidian, Drive, email, or <b>Save to Files</b> to pick a folder). ' +
+'<b>Download</b> saves straight to your Downloads folder. If Share does ' +
+'nothing, use Download.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -399,11 +399,19 @@ Pebble.addEventListener('showConfiguration', function () {
 '}' +
 'function share(){' +
 '  var n=fname("md");' +
-'  try{' +
+'  try{' +               // Web Share API (only in a secure context - not a data: page)
 '    var f=new File([MD],n,{type:"text/markdown"});' +
 '    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:n});return;}' +
 '  }catch(e){}' +
-'  try{navigator.share({title:n,text:MD});}catch(e){save("md");}' +
+'  try{if(navigator.share){navigator.share({title:n,text:MD});return;}}catch(e){}' +
+'  try{' +               // Android: an ACTION_SEND intent link -> the system share sheet' +
+'    var it="intent:#Intent;action=android.intent.action.SEND;type=text/plain;"' +
+'      +"S.android.intent.extra.SUBJECT="+encodeURIComponent(n)+";"' +
+'      +"S.android.intent.extra.TITLE="+encodeURIComponent(n)+";"' +
+'      +"S.android.intent.extra.TEXT="+encodeURIComponent(MD)+";end";' +
+'    var a=document.createElement("a");a.href=it;a.rel="noopener";' +
+'    document.body.appendChild(a);a.click();a.remove();' +
+'  }catch(e){save("md");}' +
 '}' +
 'function copyMd(){var r=document.getElementById("raw");r.select();try{document.execCommand("copy");}catch(e){}}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
