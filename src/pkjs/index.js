@@ -339,8 +339,8 @@ Pebble.addEventListener('showConfiguration', function () {
 'html,body{background:#fff;color:#111}' +
 'body{font:15px/1.5 -apple-system,Roboto,sans-serif;margin:0;padding:16px;max-width:820px}' +
 'h1{font-size:20px}h2{font-size:16px;margin-top:24px}' +
-'button,input{font:14px inherit;padding:9px 12px;margin:4px 4px 4px 0;border:1px solid #999;border-radius:8px;background:#fff;color:#111}' +
-'button{background:#2b6cb0;color:#fff;border-color:#2b6cb0}' +
+'button,input,.btn{font:14px inherit;padding:9px 12px;margin:4px 4px 4px 0;border:1px solid #999;border-radius:8px;background:#fff;color:#111}' +
+'button,.btn{background:#2b6cb0;color:#fff;border-color:#2b6cb0;text-decoration:none;display:inline-block;cursor:pointer}' +
 'input{min-width:60%}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:3px 8px}' +
 '#raw{width:100%;height:180px;font:12px monospace;background:#fff;color:#111}.mermaid{overflow-x:auto;background:#fff}' +
 '.bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #eee}' +
@@ -348,8 +348,8 @@ Pebble.addEventListener('showConfiguration', function () {
 '</style></head><body>' +
 '<div class="bar">' +
 '<button onclick="copyMd()">Copy Markdown</button>' +
-'<button onclick="dl(\'md\')">Download .md</button>' +
-'<button onclick="dl(\'json\')">Download .json</button>' +
+'<a id="dmd" class="btn" target="_blank" rel="noopener" onclick="return openA(this)">Download .md</a>' +
+'<a id="djson" class="btn" target="_blank" rel="noopener" onclick="return openA(this)">Download .json</a>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
@@ -357,8 +357,8 @@ Pebble.addEventListener('showConfiguration', function () {
 '<input id="prefix" placeholder="cardia"> <span class="hint">&rarr; ' +
 '<span id="egname">cardia</span>-report-&lt;date&gt;.md</span>' +
 '<p class="hint"><b>Copy Markdown</b> copies the whole report — paste into ' +
-'Obsidian, a note, anywhere. <b>Download</b> closes this screen and opens the ' +
-'file in your browser, where it saves to Downloads.</p>' +
+'Obsidian, a note, anywhere (most reliable). <b>Download</b> opens the file ' +
+'in a browser tab to save it.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -372,8 +372,14 @@ Pebble.addEventListener('showConfiguration', function () {
 'document.getElementById("raw").value=MD;' +
 'document.getElementById("url").value=CFG.syncUrl||"";' +
 'document.getElementById("prefix").value=CFG.filePrefix||"cardia";' +
+'function fname(kind){' +
+'  var p=(document.getElementById("prefix").value.trim()||"cardia").replace(/[^A-Za-z0-9_-]+/g,"-");' +
+'  var d=new Date(),z=function(n){return(n<10?"0":"")+n;};' +
+'  var s=d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());' +
+'  return kind==="json"?p+"-data-"+s+".json":p+"-report-"+s+".md";' +
+'}' +
 'document.getElementById("prefix").oninput=function(){' +
-'  document.getElementById("egname").textContent=(this.value.trim()||"cardia");};' +
+'  document.getElementById("egname").textContent=(this.value.trim()||"cardia");setDL();};' +
 'try{' +
 '  mermaid.initialize({startOnLoad:false,theme:"neutral"});' +
 '  var html=marked.parse(MD);' +
@@ -383,10 +389,18 @@ Pebble.addEventListener('showConfiguration', function () {
 '  mermaid.run();' +
 '}catch(e){document.getElementById("report").textContent="(preview failed: "+e+")";}' +
 'function note(t){var m=document.getElementById("msg");if(m){m.textContent=t;}}' +
-'function dl(kind){' +
-'  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
-'    dl:kind, filePrefix:document.getElementById("prefix").value.trim(),' +
-'    syncUrl:document.getElementById("url").value.trim()}));' +
+'function du(kind){' +
+'  var t=kind==="json"?JD:MD,m=kind==="json"?"application/json":"text/markdown";' +
+'  return "data:"+m+";charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(t)));' +
+'}' +
+'function setDL(){' +
+'  var a=document.getElementById("dmd"),b=document.getElementById("djson");' +
+'  a.href=du("md");a.setAttribute("download",fname("md"));' +
+'  b.href=du("json");b.setAttribute("download",fname("json"));' +
+'}' +
+'function openA(a){' +
+'  try{if(window.open(a.href,"_blank"))return false;}catch(e){}' +
+'  return true;' +   // fall through to the <a target=_blank> navigation
 '}' +
 'function copyMd(){var r=document.getElementById("raw");r.focus();r.select();' +
 '  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
@@ -397,48 +411,12 @@ Pebble.addEventListener('showConfiguration', function () {
 'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
 '  syncUrl:document.getElementById("url").value.trim(),' +
 '  filePrefix:document.getElementById("prefix").value.trim()}));}' +
+'setDL();' +
 '</script></body></html>';
 
   Pebble.openURL('data:text/html;charset=utf-8;base64,' +
     btoa(unescape(encodeURIComponent(page))));
 });
-
-function fileStamp() {
-  var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
-  return d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' +
-         z(d.getHours()) + z(d.getMinutes());
-}
-
-// A tiny page opened in the phone's browser that triggers a real file download
-// (the config web view itself can't save files).
-function openDownload(kind, prefix) {
-  var isJson = kind === 'json';
-  var content = isJson
-    ? JSON.stringify({ generated: new Date().toISOString(),
-                       samples: getSamples(), episodes: getEpisodes() }, null, 1)
-    : buildMarkdown();
-  var p = ((prefix || 'cardia').replace(/[^A-Za-z0-9_-]+/g, '-')) || 'cardia';
-  var fn = isJson ? p + '-data-' + fileStamp() + '.json' : p + '-report-' + fileStamp() + '.md';
-  var mime = isJson ? 'application/json' : 'text/markdown';
-  var C = JSON.stringify(content);
-  var esc = content.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  var page =
-    '<!doctype html><meta charset="utf-8">' +
-    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<meta name="color-scheme" content="light only">' +
-    '<body style="font-family:-apple-system,Roboto,sans-serif;background:#fff;color:#111;padding:20px">' +
-    '<p><a id="a" style="font-size:17px;color:#2b6cb0;font-weight:bold">⬇ Save ' + fn + '</a></p>' +
-    '<p style="color:#666;font-size:13px">Starts automatically. If not, tap the link ' +
-    '(or long-press → Download link). Or copy the text below.</p>' +
-    '<pre style="white-space:pre-wrap;word-break:break-word;font:12px monospace;' +
-    'border:1px solid #ccc;padding:10px;background:#fff">' + esc + '</pre>' +
-    '<script>(function(){var a=document.getElementById("a");try{' +
-    'var b=new Blob([' + C + '],{type:"' + mime + '"});a.href=URL.createObjectURL(b);' +
-    '}catch(e){a.href="data:' + mime + ';charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(' + C + ')));}' +
-    'a.download="' + fn + '";a.click();})();<\/script>';
-  Pebble.openURL('data:text/html;charset=utf-8;base64,' +
-    btoa(unescape(encodeURIComponent(page))));
-}
 
 Pebble.addEventListener('webviewclosed', function (e) {
   if (!e || !e.response) return;
@@ -456,9 +434,4 @@ Pebble.addEventListener('webviewclosed', function (e) {
   if ('syncUrl' in r) cfg.syncUrl = r.syncUrl || '';
   if ('filePrefix' in r) cfg.filePrefix = r.filePrefix || '';
   save('config', cfg);
-
-  if (r.dl) {
-    console.log('opening download for ' + r.dl);
-    openDownload(r.dl, cfg.filePrefix);
-  }
 });

@@ -1,0 +1,24 @@
+[17:03:37] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=204 pnn50=61 steps=808 mot=0
+[17:03:44] pkjs> Cardia:557:14 opening download for md
+[17:03:46] pkjs> Cardia:557:14 opening download for json
+[17:03:49] pkjs> Cardia:557:14 opening download for md
+[17:03:52] pkjs> Cardia:161:14 [sample] 87bpm Irregular rmssd=191 pnn50=57 steps=808 mot=0
+[17:04:08] pkjs> Cardia:161:14 [sample] 86bpm Irregular rmssd=186 pnn50=56 steps=808 mot=0
+[17:04:23] pkjs> Cardia:161:14 [sample] 86bpm Normal rmssd=182 pnn50=57 steps=808 mot=0
+[17:04:39] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=162 pnn50=56 steps=808 mot=0
+[17:04:54] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=148 pnn50=49 steps=808 mot=0
+[17:05:07] pkjs> Cardia:557:14 opening download for md
+[17:05:09] pkjs> Cardia:557:14 opening download for md
+[17:05:09] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=142 pnn50=44 steps=808 mot=0
+[17:05:15] pkjs> Cardia:557:14 opening download for json
+[17:05:18] pkjs> Cardia:557:14 opening download for md
+[17:05:20] pkjs> Cardia:557:14 opening download for json
+[17:05:25] pkjs> Cardia:161:14 [sample] 87bpm Irregular rmssd=153 pnn50=45 steps=808 mot=0
+[17:05:41] pkjs> Cardia:161:14 [sample] 89bpm Normal rmssd=165 pnn50=53 steps=808 mot=0
+[17:05:56] pkjs> Cardia:161:14 [sample] 89bpm Normal rmssd=157 pnn50=53 steps=808 mot=0
+[17:06:12] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=152 pnn50=53 steps=808 mot=0
+[17:06:28] pkjs> Cardia:161:14 [sample] 90bpm Normal rmssd=152 pnn50=56 steps=808 mot=0
+[17:06:43] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=147 pnn50=55 steps=808 mot=0
+[17:06:59] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=142 pnn50=56 steps=808 mot=0
+[17:07:14] pkjs> Cardia:161:14 [sample] 86bpm Normal rmssd=92 pnn50=45 steps=808 mot=0
+[17:07:27] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
