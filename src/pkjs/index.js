@@ -105,6 +105,13 @@ function hhmm(sec) {
   var dt = new Date(sec * 1000);
   return pad(dt.getHours()) + ':' + pad(dt.getMinutes());
 }
+// local "YYYY-MM-DDTHH:mm:ss" for Mermaid gantt (its dateFormat X / unix
+// handling is unreliable, so feed it a parsed local datetime instead).
+function localDT(sec) {
+  var d = new Date(sec * 1000);
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+         'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+}
 function dur(sec) {
   var m = Math.floor(sec / 60), s = sec % 60;
   return m + ':' + pad(s);
@@ -249,12 +256,12 @@ function buildMarkdown() {
     else                    { axisFmt = '%m-%d %H:%M'; tick = Math.max(1, Math.round(gSpan / 8 / 3600)) + 'hour'; }
 
     md += '## Episodes\n\n```mermaid\ngantt\n    title Episodes\n' +
-          '    dateFormat X\n    axisFormat ' + axisFmt + '\n    tickInterval ' + tick +
-          '\n    section Rhythm\n';
+          '    dateFormat YYYY-MM-DDTHH:mm:ss\n    axisFormat ' + axisFmt +
+          '\n    tickInterval ' + tick + '\n    section Rhythm\n';
     eps.forEach(function (e) {
       var d = Math.max(1, e.duration_s);
       var label = (e.type + (e.score ? ' (' + e.score + ')' : '')).replace(/[:,]/g, ' ');
-      md += '    ' + label + ' :' + e.start + ', ' + d + 's\n';
+      md += '    ' + label + ' :' + localDT(e.start) + ', ' + d + 's\n';
     });
     md += '```\n\n';
 
