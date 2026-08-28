@@ -333,13 +333,16 @@ Pebble.addEventListener('showConfiguration', function () {
 '<title>Cardia report</title>' +
 '<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>' +
 '<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>' +
+'<meta name="color-scheme" content="light only">' +
 '<style>' +
+':root{color-scheme:light}' +
+'html,body{background:#fff;color:#111}' +
 'body{font:15px/1.5 -apple-system,Roboto,sans-serif;margin:0;padding:16px;max-width:820px}' +
 'h1{font-size:20px}h2{font-size:16px;margin-top:24px}' +
-'button,input{font:14px inherit;padding:9px 12px;margin:4px 4px 4px 0;border:1px solid #999;border-radius:8px;background:#fff}' +
+'button,input{font:14px inherit;padding:9px 12px;margin:4px 4px 4px 0;border:1px solid #999;border-radius:8px;background:#fff;color:#111}' +
 'button{background:#2b6cb0;color:#fff;border-color:#2b6cb0}' +
 'input{min-width:60%}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:3px 8px}' +
-'#raw{width:100%;height:180px;font:12px monospace}.mermaid{overflow-x:auto}' +
+'#raw{width:100%;height:180px;font:12px monospace;background:#fff;color:#111}.mermaid{overflow-x:auto;background:#fff}' +
 '.bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #eee}' +
 'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
 '</style></head><body>' +
