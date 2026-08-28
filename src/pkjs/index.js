@@ -147,12 +147,14 @@ function stepDeltas(samples) {
 function barchart(title, yLabel, spanMin, series) {
   var hi = Math.max.apply(null, series.concat([1]));
   hi = Math.ceil((hi * 1.1) / 5) * 5 || 5;
-  return '```mermaid\nxychart-beta\n' +
+  return '```mermaid\n' + MM_INIT + 'xychart-beta\n' +
     '    title "' + title + '"\n' +
     '    x-axis "minutes" 0 --> ' + Math.max(1, Math.round(spanMin)) + '\n' +
     '    y-axis "' + yLabel + '" 0 --> ' + hi + '\n' +
     '    bar [' + series.join(', ') + ']\n```\n';
 }
+
+var MM_INIT = '%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#c0392b,#2b6cb0"}}}}%%\n';
 
 function xychart(title, yLabel, spanMin, series, forceLo, forceHi) {
   var vals = series.filter(function (v) { return v !== null; });
@@ -161,7 +163,7 @@ function xychart(title, yLabel, spanMin, series, forceLo, forceHi) {
   var hi = forceHi !== undefined ? forceHi : Math.ceil((Math.max.apply(null, vals) + 5) / 5) * 5;
   if (lo < 0) lo = 0;
   if (hi <= lo) hi = lo + 10;
-  return '```mermaid\nxychart-beta\n' +
+  return '```mermaid\n' + MM_INIT + 'xychart-beta\n' +
     '    title "' + title + '"\n' +
     '    x-axis "minutes" 0 --> ' + Math.max(1, Math.round(spanMin)) + '\n' +
     '    y-axis "' + yLabel + '" ' + lo + ' --> ' + hi + '\n' +
