@@ -348,21 +348,17 @@ Pebble.addEventListener('showConfiguration', function () {
 '</style></head><body>' +
 '<div class="bar">' +
 '<button onclick="copyMd()">Copy Markdown</button>' +
-'<button onclick="share()">Share</button>' +
-'<button onclick="emailIt()">Email</button>' +
-'<button onclick="save(\'md\')">Download .md</button>' +
-'<button onclick="save(\'json\')">Download .json</button>' +
+'<button onclick="dl(\'md\')">Download .md</button>' +
+'<button onclick="dl(\'json\')">Download .json</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
 '<label>Export file name</label>' +
 '<input id="prefix" placeholder="cardia"> <span class="hint">&rarr; ' +
 '<span id="egname">cardia</span>-report-&lt;date&gt;.md</span>' +
-'<p class="hint"><b>Copy Markdown</b> is the reliable one — paste into Obsidian, ' +
-'a note, anywhere. <b>Share</b> tries the Android share sheet; <b>Email</b> ' +
-'opens a draft with the report in it; <b>Download</b> saves to Downloads. ' +
-'This settings screen is a restricted web view, so Share/Download may not ' +
-'work in it — Copy always does.</p>' +
+'<p class="hint"><b>Copy Markdown</b> copies the whole report — paste into ' +
+'Obsidian, a note, anywhere. <b>Download</b> closes this screen and opens the ' +
+'file in your browser, where it saves to Downloads.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -386,35 +382,11 @@ Pebble.addEventListener('showConfiguration', function () {
 '  document.getElementById("report").innerHTML=html;' +
 '  mermaid.run();' +
 '}catch(e){document.getElementById("report").textContent="(preview failed: "+e+")";}' +
-'function fname(kind){' +
-'  var p=(document.getElementById("prefix").value.trim()||"cardia").replace(/[^A-Za-z0-9_-]+/g,"-");' +
-'  var d=new Date(),z=function(n){return(n<10?"0":"")+n;};' +
-'  var stamp=d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());' +
-'  return kind==="json"?p+"-data-"+stamp+".json":p+"-report-"+stamp+".md";' +
-'}' +
-'function payload(kind){return kind==="json"?[JD,"application/json"]:[MD,"text/markdown"];}' +
-'function save(kind){' +
-'  var n=fname(kind),x=payload(kind);' +
-'  try{' +
-'    var b=new Blob([x[0]],{type:x[1]}),a=document.createElement("a");' +
-'    a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();a.remove();' +
-'  }catch(e){location.href="data:"+x[1]+";base64,"+btoa(unescape(encodeURIComponent(x[0])));}' +
-'}' +
 'function note(t){var m=document.getElementById("msg");if(m){m.textContent=t;}}' +
-'function share(){' +
-'  var n=fname("md");' +
-'  try{' +               // Web Share API - only exists in a secure context (not a data: page)
-'    var f=new File([MD],n,{type:"text/markdown"});' +
-'    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:n});return;}' +
-'  }catch(e){}' +
-'  try{if(navigator.share){navigator.share({title:n,text:MD});return;}}catch(e){}' +
-'  note("The system share sheet isn\'t reachable from this settings view. Use Email, or Copy Markdown and paste it.");' +
-'}' +
-'function emailIt(){' +
-'  var n=fname("md");' +
-'  note("Opening an email draft…");' +
-'  try{window.location.href="mailto:?subject="+encodeURIComponent(n)+"&body="+encodeURIComponent(MD);}' +
-'  catch(e){note("Couldn\'t open email — use Copy Markdown.");}' +
+'function dl(kind){' +
+'  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
+'    dl:kind, filePrefix:document.getElementById("prefix").value.trim(),' +
+'    syncUrl:document.getElementById("url").value.trim()}));' +
 '}' +
 'function copyMd(){var r=document.getElementById("raw");r.focus();r.select();' +
 '  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
@@ -431,20 +403,62 @@ Pebble.addEventListener('showConfiguration', function () {
     btoa(unescape(encodeURIComponent(page))));
 });
 
+function fileStamp() {
+  var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' +
+         z(d.getHours()) + z(d.getMinutes());
+}
+
+// A tiny page opened in the phone's browser that triggers a real file download
+// (the config web view itself can't save files).
+function openDownload(kind, prefix) {
+  var isJson = kind === 'json';
+  var content = isJson
+    ? JSON.stringify({ generated: new Date().toISOString(),
+                       samples: getSamples(), episodes: getEpisodes() }, null, 1)
+    : buildMarkdown();
+  var p = ((prefix || 'cardia').replace(/[^A-Za-z0-9_-]+/g, '-')) || 'cardia';
+  var fn = isJson ? p + '-data-' + fileStamp() + '.json' : p + '-report-' + fileStamp() + '.md';
+  var mime = isJson ? 'application/json' : 'text/markdown';
+  var C = JSON.stringify(content);
+  var esc = content.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  var page =
+    '<!doctype html><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<meta name="color-scheme" content="light only">' +
+    '<body style="font-family:-apple-system,Roboto,sans-serif;background:#fff;color:#111;padding:20px">' +
+    '<p><a id="a" style="font-size:17px;color:#2b6cb0;font-weight:bold">⬇ Save ' + fn + '</a></p>' +
+    '<p style="color:#666;font-size:13px">Starts automatically. If not, tap the link ' +
+    '(or long-press → Download link). Or copy the text below.</p>' +
+    '<pre style="white-space:pre-wrap;word-break:break-word;font:12px monospace;' +
+    'border:1px solid #ccc;padding:10px;background:#fff">' + esc + '</pre>' +
+    '<script>(function(){var a=document.getElementById("a");try{' +
+    'var b=new Blob([' + C + '],{type:"' + mime + '"});a.href=URL.createObjectURL(b);' +
+    '}catch(e){a.href="data:' + mime + ';charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(' + C + ')));}' +
+    'a.download="' + fn + '";a.click();})();<\/script>';
+  Pebble.openURL('data:text/html;charset=utf-8;base64,' +
+    btoa(unescape(encodeURIComponent(page))));
+}
+
 Pebble.addEventListener('webviewclosed', function (e) {
   if (!e || !e.response) return;
   var r;
   try { r = JSON.parse(decodeURIComponent(e.response)); } catch (x) { return; }
+
   if (r.clear) {
     localStorage.removeItem('samples');
     localStorage.removeItem('episodes');
     console.log('Cardia data cleared');
     return;
   }
+
   var cfg = getConfig();
   if ('syncUrl' in r) cfg.syncUrl = r.syncUrl || '';
   if ('filePrefix' in r) cfg.filePrefix = r.filePrefix || '';
   save('config', cfg);
-  console.log('config saved: syncUrl ' + (cfg.syncUrl ? 'set' : 'off') +
-              ', filePrefix "' + (cfg.filePrefix || 'cardia') + '"');
+
+  if (r.dl) {
+    console.log('opening download for ' + r.dl);
+    openDownload(r.dl, cfg.filePrefix);
+  }
 });
