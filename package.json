@@ -1,0 +1,43 @@
+{
+  "name": "pebble-heart-rate",
+  "author": "BW",
+  "version": "1.0.0",
+  "keywords": ["pebble-app", "health", "heart-rate"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Cardia",
+    "uuid": "fb3899da-2604-404d-9e56-2fec8ea2e3e6",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "capabilities": [
+      "health"
+    ],
+    "messageKeys": [
+      "MSG_KIND",
+      "BPM",
+      "STATUS",
+      "RMSSD",
+      "PNN50",
+      "SDNN",
+      "MOTION",
+      "EP_START",
+      "EP_DURATION",
+      "EP_ONGOING",
+      "EP_HR_PEAK",
+      "EP_HR_MIN",
+      "EP_SCORE",
+      "DBG_TRIGGER"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}
