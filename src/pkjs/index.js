@@ -238,12 +238,22 @@ function buildMarkdown() {
   }
 
   if (eps.length) {
+    // Pick an axis format (and tick spacing) from how much time the episodes
+    // span, so short spans don't render every tick as the same minute.
+    var gFirst = eps[0].start, gLast = 0;
+    eps.forEach(function (e) { gLast = Math.max(gLast, e.start + Math.max(1, e.duration_s)); });
+    var gSpan = Math.max(1, gLast - gFirst);
+    var axisFmt, tick;
+    if (gSpan < 900)        { axisFmt = '%H:%M:%S'; tick = Math.max(5, Math.round(gSpan / 6)) + 'second'; }
+    else if (gSpan < 86400) { axisFmt = '%H:%M';    tick = Math.max(1, Math.round(gSpan / 360)) + 'minute'; }
+    else                    { axisFmt = '%m-%d %H:%M'; tick = Math.max(1, Math.round(gSpan / 8 / 3600)) + 'hour'; }
+
     md += '## Episodes\n\n```mermaid\ngantt\n    title Episodes\n' +
-          '    dateFormat X\n    axisFormat %H:%M\n    section Rhythm\n';
+          '    dateFormat X\n    axisFormat ' + axisFmt + '\n    tickInterval ' + tick +
+          '\n    section Rhythm\n';
     eps.forEach(function (e) {
       var d = Math.max(1, e.duration_s);
-      var label = e.type + (e.score ? ' (' + e.score + ')' : '');
-      label = label.replace(/[:,]/g, ' ');
+      var label = (e.type + (e.score ? ' (' + e.score + ')' : '')).replace(/[:,]/g, ' ');
       md += '    ' + label + ' :' + e.start + ', ' + d + 's\n';
     });
     md += '```\n\n';
