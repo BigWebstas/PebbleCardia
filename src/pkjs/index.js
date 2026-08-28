@@ -62,6 +62,9 @@ Pebble.addEventListener('appmessage', function (e) {
       motion: d.MOTION || 0,
       steps: d.STEPS || 0        // cumulative steps today (resets at midnight)
     };
+    console.log('[sample] ' + s.bpm + 'bpm ' + s.status + ' rmssd=' + s.rmssd +
+                ' pnn50=' + s.pnn50 + ' sdnn=' + s.sdnn + ' steps=' + s.steps +
+                ' mot=' + s.motion);
     var samples = getSamples();
     samples.push(s);
     while (samples.length > MAX_SAMPLES) samples.shift();
@@ -322,17 +325,27 @@ Pebble.addEventListener('showConfiguration', function () {
 'input{min-width:60%}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:3px 8px}' +
 '#raw{width:100%;height:180px;font:12px monospace}.mermaid{overflow-x:auto}' +
 '.bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #eee}' +
+'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
 '</style></head><body>' +
 '<div class="bar">' +
-'<button onclick="save()">Save report.md</button>' +
-'<button onclick="saveJson()">Save data.json</button>' +
-'<button onclick="copyMd()">Copy Markdown</button>' +
+'<button onclick="save(\'md\')">Download .md</button>' +
+'<button onclick="save(\'json\')">Download .json</button>' +
+'<button onclick="share()">Share report</button>' +
+'<button onclick="copyMd()">Copy</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear data</button>' +
 '</div>' +
-'<p>Live sync URL (optional) — every sample &amp; episode is POSTed here as JSON. ' +
-'A Google Apps Script that appends to a Sheet is in <code>tools/cardia-sheet-sync.gs</code>.<br>' +
+'<label>Export file name</label>' +
+'<input id="prefix" placeholder="cardia"> <span class="hint">&rarr; ' +
+'<span id="egname">cardia</span>-report-&lt;date&gt;.md</span>' +
+'<p class="hint">A web page can\'t choose a save <i>folder</i> on Android — ' +
+'downloads go to your Downloads folder. Use <b>Share report</b> &rarr; ' +
+'<b>Save to Files</b> to put it in a specific folder (the picker remembers ' +
+'the last one you used).</p>' +
+'<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
-'<button onclick="done()">Save &amp; close</button></p>' +
+'<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
+'Google Apps Script &rarr; Sheet: <code>tools/cardia-sheet-sync.gs</code>.</p>' +
+'<button onclick="done()">Save settings &amp; close</button>' +
 '<div id="report">Rendering…</div><h2>Raw Markdown</h2><textarea id="raw"></textarea>' +
 '<script>' +
 'var MD=' + JSON.stringify(md) + ';' +
@@ -340,6 +353,9 @@ Pebble.addEventListener('showConfiguration', function () {
 'var CFG=' + JSON.stringify(cfg) + ';' +
 'document.getElementById("raw").value=MD;' +
 'document.getElementById("url").value=CFG.syncUrl||"";' +
+'document.getElementById("prefix").value=CFG.filePrefix||"cardia";' +
+'document.getElementById("prefix").oninput=function(){' +
+'  document.getElementById("egname").textContent=(this.value.trim()||"cardia");};' +
 'try{' +
 '  mermaid.initialize({startOnLoad:false,theme:"neutral"});' +
 '  var html=marked.parse(MD);' +
@@ -348,24 +364,34 @@ Pebble.addEventListener('showConfiguration', function () {
 '  document.getElementById("report").innerHTML=html;' +
 '  mermaid.run();' +
 '}catch(e){document.getElementById("report").textContent="(preview failed: "+e+")";}' +
-'function blob(name,text,mime){' +
-'  try{' +
-'    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([text],name,{type:mime})]})){' +
-'      navigator.share({files:[new File([text],name,{type:mime})],title:name});return;}' +
-'  }catch(e){}' +
-'  try{' +
-'    var b=new Blob([text],{type:mime}),a=document.createElement("a");' +
-'    a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();' +
-'  }catch(e){' +
-'    location.href="data:"+mime+";base64,"+btoa(unescape(encodeURIComponent(text)));' +
-'  }' +
+'function fname(kind){' +
+'  var p=(document.getElementById("prefix").value.trim()||"cardia").replace(/[^A-Za-z0-9_-]+/g,"-");' +
+'  var d=new Date(),z=function(n){return(n<10?"0":"")+n;};' +
+'  var stamp=d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());' +
+'  return kind==="json"?p+"-data-"+stamp+".json":p+"-report-"+stamp+".md";' +
 '}' +
-'function save(){blob("cardia-report.md",MD,"text/markdown");}' +
-'function saveJson(){blob("cardia-data.json",JD,"application/json");}' +
+'function payload(kind){return kind==="json"?[JD,"application/json"]:[MD,"text/markdown"];}' +
+'function save(kind){' +
+'  var n=fname(kind),x=payload(kind);' +
+'  try{' +
+'    var b=new Blob([x[0]],{type:x[1]}),a=document.createElement("a");' +
+'    a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();a.remove();' +
+'  }catch(e){location.href="data:"+x[1]+";base64,"+btoa(unescape(encodeURIComponent(x[0])));}' +
+'}' +
+'function share(){' +
+'  var n=fname("md");' +
+'  try{' +
+'    var f=new File([MD],n,{type:"text/markdown"});' +
+'    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:n});return;}' +
+'  }catch(e){}' +
+'  try{navigator.share({title:n,text:MD});}catch(e){save("md");}' +
+'}' +
 'function copyMd(){var r=document.getElementById("raw");r.select();try{document.execCommand("copy");}catch(e){}}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
 '  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
-'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({syncUrl:document.getElementById("url").value.trim()}));}' +
+'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
+'  syncUrl:document.getElementById("url").value.trim(),' +
+'  filePrefix:document.getElementById("prefix").value.trim()}));}' +
 '</script></body></html>';
 
   Pebble.openURL('data:text/html;charset=utf-8;base64,' +
@@ -383,7 +409,9 @@ Pebble.addEventListener('webviewclosed', function (e) {
     return;
   }
   var cfg = getConfig();
-  cfg.syncUrl = r.syncUrl || '';
+  if ('syncUrl' in r) cfg.syncUrl = r.syncUrl || '';
+  if ('filePrefix' in r) cfg.filePrefix = r.filePrefix || '';
   save('config', cfg);
-  console.log('sync URL ' + (cfg.syncUrl ? 'set' : 'cleared'));
+  console.log('config saved: syncUrl ' + (cfg.syncUrl ? 'set' : 'off') +
+              ', filePrefix "' + (cfg.filePrefix || 'cardia') + '"');
 });
