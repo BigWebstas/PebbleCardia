@@ -63,8 +63,7 @@ Pebble.addEventListener('appmessage', function (e) {
       steps: d.STEPS || 0        // cumulative steps today (resets at midnight)
     };
     console.log('[sample] ' + s.bpm + 'bpm ' + s.status + ' rmssd=' + s.rmssd +
-                ' pnn50=' + s.pnn50 + ' sdnn=' + s.sdnn + ' steps=' + s.steps +
-                ' mot=' + s.motion);
+                ' pnn50=' + s.pnn50 + ' steps=' + s.steps + ' mot=' + s.motion);
     var samples = getSamples();
     samples.push(s);
     while (samples.length > MAX_SAMPLES) samples.shift();
@@ -273,18 +272,18 @@ function buildMarkdown() {
   if (samples.length > 4) {
     var sd = stepDeltas(samples);
     md += '<details>\n<summary>Minute-by-minute data</summary>\n\n';
-    md += '| Time | bpm | RMSSD | pNN50 | SDNN | steps | motion | status |\n' +
-          '|---|---|---|---|---|---|---|---|\n';
+    md += '| Time | bpm | RMSSD | pNN50 | steps | motion | status |\n' +
+          '|---|---|---|---|---|---|---|\n';
     var bucket = null, rows = [];
     samples.forEach(function (s, idx) {
       var key = Math.floor(s.t / 60);
       if (!bucket || bucket.key !== key) {
         if (bucket) rows.push(bucket);
-        bucket = { key: key, t: s.t, bpm: [], rmssd: [], pnn50: [], sdnn: [], motion: [], steps: 0, status: s.status };
+        bucket = { key: key, t: s.t, bpm: [], rmssd: [], pnn50: [], motion: [], steps: 0, status: s.status };
       }
       if (s.bpm > 0) bucket.bpm.push(s.bpm);
       bucket.rmssd.push(s.rmssd); bucket.pnn50.push(s.pnn50);
-      bucket.sdnn.push(s.sdnn); bucket.motion.push(s.motion);
+      bucket.motion.push(s.motion);
       bucket.steps += sd[idx];
       bucket.status = s.status;
     });
@@ -292,7 +291,7 @@ function buildMarkdown() {
     function avg(a) { return a.length ? Math.round(a.reduce(function (x, y) { return x + y; }, 0) / a.length) : 0; }
     rows.forEach(function (r) {
       md += '| ' + hhmm(r.t) + ' | ' + (avg(r.bpm) || '—') + ' | ' + avg(r.rmssd) +
-            ' | ' + avg(r.pnn50) + ' | ' + avg(r.sdnn) + ' | ' + r.steps +
+            ' | ' + avg(r.pnn50) + ' | ' + r.steps +
             ' | ' + avg(r.motion) + ' | ' + r.status + ' |\n';
     });
     md += '\n</details>\n';
