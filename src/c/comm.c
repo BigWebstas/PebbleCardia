@@ -89,6 +89,8 @@ void comm_send_status(const MonitorSnapshot *snap) {
   dict_write_uint8(it, MESSAGE_KEY_PNN50, snap->pnn50_pct);
   dict_write_uint16(it, MESSAGE_KEY_SDNN, snap->sdnn_ms);
   dict_write_uint8(it, MESSAGE_KEY_MOTION, snap->motion);
+  dict_write_uint32(it, MESSAGE_KEY_STEPS,
+                    (uint32_t)health_service_sum_today(HealthMetricStepCount));
   app_message_outbox_send();
 }
 

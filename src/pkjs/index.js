@@ -57,7 +57,8 @@ Pebble.addEventListener('appmessage', function (e) {
       rmssd: d.RMSSD || 0,
       pnn50: d.PNN50 || 0,
       sdnn: d.SDNN || 0,
-      motion: d.MOTION || 0
+      motion: d.MOTION || 0,
+      steps: d.STEPS || 0        // cumulative steps today (resets at midnight)
     };
     var samples = getSamples();
     samples.push(s);
@@ -128,6 +129,29 @@ function fillNulls(arr) {
   return arr.map(function (v) { if (v === null) return last; last = v; return v; });
 }
 
+// per-sample step counts from the cumulative "steps today" field, handling the
+// midnight reset. Returns an array aligned with `samples` (first entry 0).
+function stepDeltas(samples) {
+  var out = [0];
+  for (var i = 1; i < samples.length; i++) {
+    var d = samples[i].steps - samples[i - 1].steps;
+    if (d < 0) d = samples[i].steps;   // counter reset at midnight
+    out.push(d);
+  }
+  return out;
+}
+
+// mermaid bar chart (x is elapsed minutes 0..span)
+function barchart(title, yLabel, spanMin, series) {
+  var hi = Math.max.apply(null, series.concat([1]));
+  hi = Math.ceil((hi * 1.1) / 5) * 5 || 5;
+  return '```mermaid\nxychart-beta\n' +
+    '    title "' + title + '"\n' +
+    '    x-axis "minutes" 0 --> ' + Math.max(1, Math.round(spanMin)) + '\n' +
+    '    y-axis "' + yLabel + '" 0 --> ' + hi + '\n' +
+    '    bar [' + series.join(', ') + ']\n```\n';
+}
+
 function xychart(title, yLabel, spanMin, series, forceLo, forceHi) {
   var vals = series.filter(function (v) { return v !== null; });
   if (!vals.length) return '';
@@ -161,6 +185,12 @@ function buildMarkdown() {
             'avg **' + Math.round(bpms.reduce(function (a, b) { return a + b; }, 0) / bpms.length) + '**, ' +
             'max **' + Math.max.apply(null, bpms) + '** bpm\n\n';
     }
+
+    var totalSteps = stepDeltas(samples).reduce(function (a, b) { return a + b; }, 0);
+    if (totalSteps > 0) {
+      md += 'Steps: **' + totalSteps + '** during the window' +
+            ' (' + samples[samples.length - 1].steps + ' so far today)\n\n';
+    }
   } else {
     md += '_No samples recorded yet — open the Cardia app on the watch for a while._\n\n';
   }
@@ -185,6 +215,20 @@ function buildMarkdown() {
           xychart('RMSSD (ms)', 'ms', span, downsample(samples, 'rmssd', N), 0, undefined);
     md += '## pNN50\n\n' +
           xychart('pNN50 (%)', '%', span, downsample(samples, 'pnn50', N), 0, 100);
+
+    // steps: bucket per-sample deltas into ~N bars across the window
+    var deltas = stepDeltas(samples);
+    if (deltas.reduce(function (a, b) { return a + b; }, 0) > 0) {
+      var bars = [], per = samples.length / N;
+      for (var b = 0; b < N; b++) {
+        var lo = Math.floor(b * per), hi = Math.floor((b + 1) * per);
+        if (hi <= lo) hi = lo + 1;
+        var sum = 0;
+        for (var i = lo; i < hi && i < deltas.length; i++) sum += deltas[i];
+        bars.push(sum);
+      }
+      md += '## Steps\n\n' + barchart('Steps per interval', 'steps', span, bars);
+    }
   }
 
   if (eps.length) {
@@ -218,28 +262,31 @@ function buildMarkdown() {
     md += '\n';
   }
 
-  // 1-minute HR/HRV table
+  // 1-minute table
   if (samples.length > 4) {
+    var sd = stepDeltas(samples);
     md += '<details>\n<summary>Minute-by-minute data</summary>\n\n';
-    md += '| Time | bpm | RMSSD | pNN50 | SDNN | motion | status |\n|---|---|---|---|---|---|---|\n';
+    md += '| Time | bpm | RMSSD | pNN50 | SDNN | steps | motion | status |\n' +
+          '|---|---|---|---|---|---|---|---|\n';
     var bucket = null, rows = [];
-    samples.forEach(function (s) {
+    samples.forEach(function (s, idx) {
       var key = Math.floor(s.t / 60);
       if (!bucket || bucket.key !== key) {
         if (bucket) rows.push(bucket);
-        bucket = { key: key, t: s.t, bpm: [], rmssd: [], pnn50: [], sdnn: [], motion: [], status: s.status };
+        bucket = { key: key, t: s.t, bpm: [], rmssd: [], pnn50: [], sdnn: [], motion: [], steps: 0, status: s.status };
       }
       if (s.bpm > 0) bucket.bpm.push(s.bpm);
       bucket.rmssd.push(s.rmssd); bucket.pnn50.push(s.pnn50);
       bucket.sdnn.push(s.sdnn); bucket.motion.push(s.motion);
+      bucket.steps += sd[idx];
       bucket.status = s.status;
     });
     if (bucket) rows.push(bucket);
     function avg(a) { return a.length ? Math.round(a.reduce(function (x, y) { return x + y; }, 0) / a.length) : 0; }
     rows.forEach(function (r) {
       md += '| ' + hhmm(r.t) + ' | ' + (avg(r.bpm) || '—') + ' | ' + avg(r.rmssd) +
-            ' | ' + avg(r.pnn50) + ' | ' + avg(r.sdnn) + ' | ' + avg(r.motion) +
-            ' | ' + r.status + ' |\n';
+            ' | ' + avg(r.pnn50) + ' | ' + avg(r.sdnn) + ' | ' + r.steps +
+            ' | ' + avg(r.motion) + ' | ' + r.status + ' |\n';
     });
     md += '\n</details>\n';
   }

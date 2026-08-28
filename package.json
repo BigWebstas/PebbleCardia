@@ -28,6 +28,7 @@
       "PNN50",
       "SDNN",
       "MOTION",
+      "STEPS",
       "EP_START",
       "EP_DURATION",
       "EP_ONGOING",
