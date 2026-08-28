@@ -347,19 +347,22 @@ Pebble.addEventListener('showConfiguration', function () {
 'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
 '</style></head><body>' +
 '<div class="bar">' +
+'<button onclick="copyMd()">Copy Markdown</button>' +
+'<button onclick="share()">Share</button>' +
+'<button onclick="emailIt()">Email</button>' +
 '<button onclick="save(\'md\')">Download .md</button>' +
 '<button onclick="save(\'json\')">Download .json</button>' +
-'<button onclick="share()">Share report</button>' +
-'<button onclick="copyMd()">Copy</button>' +
-'<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear data</button>' +
+'<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
+'<div id="msg" class="hint"></div>' +
 '<label>Export file name</label>' +
 '<input id="prefix" placeholder="cardia"> <span class="hint">&rarr; ' +
 '<span id="egname">cardia</span>-report-&lt;date&gt;.md</span>' +
-'<p class="hint"><b>Share report</b> opens the Android share sheet (send to ' +
-'Obsidian, Drive, email, or <b>Save to Files</b> to pick a folder). ' +
-'<b>Download</b> saves straight to your Downloads folder. If Share does ' +
-'nothing, use Download.</p>' +
+'<p class="hint"><b>Copy Markdown</b> is the reliable one — paste into Obsidian, ' +
+'a note, anywhere. <b>Share</b> tries the Android share sheet; <b>Email</b> ' +
+'opens a draft with the report in it; <b>Download</b> saves to Downloads. ' +
+'This settings screen is a restricted web view, so Share/Download may not ' +
+'work in it — Copy always does.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -397,23 +400,26 @@ Pebble.addEventListener('showConfiguration', function () {
 '    a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();a.remove();' +
 '  }catch(e){location.href="data:"+x[1]+";base64,"+btoa(unescape(encodeURIComponent(x[0])));}' +
 '}' +
+'function note(t){var m=document.getElementById("msg");if(m){m.textContent=t;}}' +
 'function share(){' +
 '  var n=fname("md");' +
-'  try{' +               // Web Share API (only in a secure context - not a data: page)
+'  try{' +               // Web Share API - only exists in a secure context (not a data: page)
 '    var f=new File([MD],n,{type:"text/markdown"});' +
 '    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:n});return;}' +
 '  }catch(e){}' +
 '  try{if(navigator.share){navigator.share({title:n,text:MD});return;}}catch(e){}' +
-'  try{' +               // Android: an ACTION_SEND intent link -> the system share sheet' +
-'    var it="intent:#Intent;action=android.intent.action.SEND;type=text/plain;"' +
-'      +"S.android.intent.extra.SUBJECT="+encodeURIComponent(n)+";"' +
-'      +"S.android.intent.extra.TITLE="+encodeURIComponent(n)+";"' +
-'      +"S.android.intent.extra.TEXT="+encodeURIComponent(MD)+";end";' +
-'    var a=document.createElement("a");a.href=it;a.rel="noopener";' +
-'    document.body.appendChild(a);a.click();a.remove();' +
-'  }catch(e){save("md");}' +
+'  note("The system share sheet isn\'t reachable from this settings view. Use Email, or Copy Markdown and paste it.");' +
 '}' +
-'function copyMd(){var r=document.getElementById("raw");r.select();try{document.execCommand("copy");}catch(e){}}' +
+'function emailIt(){' +
+'  var n=fname("md");' +
+'  note("Opening an email draft…");' +
+'  try{window.location.href="mailto:?subject="+encodeURIComponent(n)+"&body="+encodeURIComponent(MD);}' +
+'  catch(e){note("Couldn\'t open email — use Copy Markdown.");}' +
+'}' +
+'function copyMd(){var r=document.getElementById("raw");r.focus();r.select();' +
+'  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
+'  var ok=false;try{ok=document.execCommand("copy");}catch(e){}' +
+'  note(ok?"Copied to clipboard.":"Select the text below and copy it manually.");}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
 '  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
 'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
