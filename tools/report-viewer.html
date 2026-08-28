@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Cardia report</title>
+<!--
+  Cardia report viewer.
+
+  The Core (Pebble) app's settings web view can't save files or open the
+  Android share sheet. This page can - it just has to be served over https.
+
+  HOST IT (pick one, all free):
+    - Netlify Drop:  drag this file onto https://app.netlify.com/drop
+    - GitHub Pages:  put it in a repo, enable Pages, use the .../report-viewer.html URL
+    - Cloudflare Pages / Vercel / any static host
+    - Or jsDelivr from a PUBLIC GitHub repo:
+        https://cdn.jsdelivr.net/gh/<user>/<repo>@<branch>/tools/report-viewer.html
+
+  Then in the Cardia settings page (Pebble app -> Cardia -> gear) paste that
+  https URL into "Report viewer URL" and Save. The Save/Share button there
+  opens this page with the report in the URL fragment (never sent to any
+  server - it's processed entirely in your browser).
+-->
+<style>
+  :root { color-scheme: light; }
+  html, body { background: #fff; color: #111; }
+  body { font: 15px/1.55 -apple-system, Roboto, Segoe UI, sans-serif; margin: 0; padding: 16px; max-width: 860px; }
+  h1 { font-size: 20px; margin: 4px 0 2px; }
+  h2 { font-size: 16px; margin-top: 26px; }
+  .bar { position: sticky; top: 0; background: #fff; padding: 8px 0; border-bottom: 1px solid #eee; z-index: 5; }
+  button { font: 14px inherit; padding: 10px 14px; margin: 4px 6px 4px 0; border: 1px solid #2b6cb0;
+           border-radius: 8px; background: #2b6cb0; color: #fff; cursor: pointer; }
+  button.ghost { background: #fff; color: #2b6cb0; }
+  #msg { color: #555; font-size: 13px; min-height: 18px; margin: 6px 0; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid #ccc; padding: 3px 8px; }
+  pre.mermaid { overflow-x: auto; background: #fff; }
+  textarea { width: 100%; height: 200px; font: 12px/1.4 ui-monospace, Menlo, monospace;
+             background: #fff; color: #111; border: 1px solid #ccc; border-radius: 6px; }
+  .empty { color: #666; padding: 40px 0; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <button onclick="save('md')">Save .md</button>
+  <button onclick="save('json')" class="ghost">Save .json</button>
+  <button onclick="share()">Share</button>
+  <button onclick="copy('md')" class="ghost">Copy</button>
+</div>
+<div id="msg"></div>
+<div id="report"><p class="empty">Loading…</p></div>
+<h2 id="rawh" hidden>Markdown</h2>
+<textarea id="raw" hidden onclick="this.select()"></textarea>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+"use strict";
+var MD = "", JD = "", NAME = "cardia-report";
+
+function note(t) { document.getElementById("msg").textContent = t || ""; }
+
+function decodeHash() {
+  var h = location.hash.replace(/^#/, "");
+  if (!h) return null;
+  try {
+    var json = decodeURIComponent(escape(atob(decodeURIComponent(h))));
+    return JSON.parse(json);
+  } catch (e) { note("Couldn't read the report data: " + e); return null; }
+}
+
+function fname(kind) {
+  var d = new Date(), z = function (n) { return (n < 10 ? "0" : "") + n; };
+  var stamp = d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + "-" + z(d.getHours()) + z(d.getMinutes());
+  var base = (NAME || "cardia").replace(/[^A-Za-z0-9_-]+/g, "-");
+  return kind === "json" ? base + "-data-" + stamp + ".json" : base + "-report-" + stamp + ".md";
+}
+function blobFor(kind) {
+  return kind === "json"
+    ? new Blob([JD || "{}"], { type: "application/json" })
+    : new Blob([MD || ""], { type: "text/markdown" });
+}
+
+function save(kind) {
+  try {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blobFor(kind));
+    a.download = fname(kind);
+    document.body.appendChild(a); a.click(); a.remove();
+    note("Saved " + fname(kind) + " to your downloads.");
+  } catch (e) { note("Save failed: " + e); }
+}
+
+function share() {
+  var f = new File([blobFor("md")], fname("md"), { type: "text/markdown" });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) {
+    navigator.share({ files: [f], title: fname("md") }).catch(function () {});
+    return;
+  }
+  if (navigator.share) {
+    navigator.share({ title: fname("md"), text: MD }).catch(function () {});
+    return;
+  }
+  note("Sharing isn't available in this browser — use Save or Copy.");
+}
+
+function copy(kind) {
+  var t = kind === "json" ? JD : MD, ta = document.getElementById("raw");
+  ta.value = t; ta.hidden = false; document.getElementById("rawh").hidden = false;
+  ta.focus(); ta.select();
+  var ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) {}
+  if (!ok && navigator.clipboard) {
+    navigator.clipboard.writeText(t).then(function () { note("Copied."); },
+                                          function () { note("Select the text below and copy it."); });
+    return;
+  }
+  note(ok ? "Copied." : "Select the text below and copy it.");
+}
+
+(function init() {
+  var data = decodeHash();
+  if (!data || !data.md) {
+    document.getElementById("report").innerHTML =
+      '<div class="empty">Open this page from the Cardia settings screen ' +
+      '(Pebble app &rarr; Cardia &rarr; gear &rarr; <b>Save / Share report</b>).<br><br>' +
+      'It expects the report in the URL fragment.</div>';
+    note("");
+    return;
+  }
+  MD = data.md; JD = data.json || ""; NAME = data.name || "cardia-report";
+  document.getElementById("raw").value = MD;
+
+  try {
+    mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "loose" });
+    var html = marked.parse(MD);
+    html = html.replace(/<pre><code class="language-mermaid[^"]*">([\s\S]*?)<\/code><\/pre>/g,
+      function (_, c) {
+        return '<pre class="mermaid">' +
+          c.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"') +
+          "</pre>";
+      });
+    document.getElementById("report").innerHTML = html;
+    mermaid.run();
+  } catch (e) {
+    document.getElementById("report").innerHTML =
+      '<p class="empty">Chart preview failed (' + e + '). The Markdown is intact — use Save or Copy.</p>';
+  }
+  note("Report loaded. Save it, Share it, or Copy the text.");
+})();
+</script>
+</body>
+</html>

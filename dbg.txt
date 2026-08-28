@@ -76,3 +76,38 @@
 [17:17:22] pkjs> Cardia:161:14 [sample] 83bpm Normal rmssd=0 pnn50=0 steps=808 mot=0
 [17:17:25] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
 [17:17:25] ocess_manager.c:487> Heap Usage for Worker <Cardia>: Total Size <4752B> Used <2116B> Still allocated <0B>
+[17:17:29] pkjs> Cardia:? Pebble JS Bridge initialized.
+[17:17:29] pkjs> Cardia:140:12 Cardia JS ready. samples=264 episodes=11
+[17:17:29] pkjs> Cardia:182:14 [episode] {"start":1787955969,"startISO":"2026-08-28T22:26:09.000Z","duration_s":36,"ongoing":false,"type":"Irregular","hr_min":87,"hr_peak":91,"score":82}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787955021,"startISO":"2026-08-28T22:10:21.000Z","duration_s":28,"ongoing":false,"type":"Irregular","hr_min":93,"hr_peak":93,"score":67}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787953510,"startISO":"2026-08-28T21:45:10.000Z","duration_s":52,"ongoing":false,"type":"Elevated","hr_min":120,"hr_peak":122,"score":25}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787953275,"startISO":"2026-08-28T21:41:15.000Z","duration_s":41,"ongoing":false,"type":"Elevated","hr_min":121,"hr_peak":122,"score":11}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787952914,"startISO":"2026-08-28T21:35:14.000Z","duration_s":327,"ongoing":false,"type":"Elevated","hr_min":120,"hr_peak":126,"score":36}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787950354,"startISO":"2026-08-28T20:52:34.000Z","duration_s":56,"ongoing":false,"type":"Irregular","hr_min":94,"hr_peak":94,"score":84}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787949595,"startISO":"2026-08-28T20:39:55.000Z","duration_s":20,"ongoing":false,"type":"Irregular","hr_min":79,"hr_peak":81,"score":91}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787949563,"startISO":"2026-08-28T20:39:23.000Z","duration_s":16,"ongoing":false,"type":"Irregular","hr_min":85,"hr_peak":86,"score":100}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787949492,"startISO":"2026-08-28T20:38:12.000Z","duration_s":15,"ongoing":false,"type":"Irregular","hr_min":88,"hr_peak":88,"score":100}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787948232,"startISO":"2026-08-28T20:17:12.000Z","duration_s":65,"ongoing":false,"type":"Irregular","hr_min":80,"hr_peak":90,"score":100}
+[17:17:30] pkjs> Cardia:182:14 [episode] {"start":1787948076,"startISO":"2026-08-28T20:14:36.000Z","duration_s":81,"ongoing":false,"type":"Irregular","hr_min":78,"hr_peak":81,"score":100}
+[17:17:45] pkjs> Cardia:161:14 [sample] 0bpm No signal rmssd=0 pnn50=0 steps=808 mot=0
+[17:18:01] pkjs> Cardia:161:14 [sample] 82bpm Normal rmssd=239 pnn50=48 steps=808 mot=0
+[17:18:16] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=222 pnn50=50 steps=808 mot=0
+[17:18:31] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=225 pnn50=51 steps=808 mot=0
+[17:18:47] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=216 pnn50=55 steps=808 mot=0
+[17:19:02] pkjs> Cardia:161:14 [sample] 90bpm Irregular rmssd=212 pnn50=53 steps=808 mot=0
+[17:19:17] pkjs> Cardia:161:14 [sample] 86bpm Normal rmssd=174 pnn50=41 steps=808 mot=0
+[17:19:33] pkjs> Cardia:161:14 [sample] 89bpm Normal rmssd=140 pnn50=29 steps=808 mot=0
+[17:19:48] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=89 pnn50=16 steps=808 mot=0
+[17:20:03] pkjs> Cardia:161:14 [sample] 90bpm Normal rmssd=38 pnn50=8 steps=808 mot=0
+[17:20:19] pkjs> Cardia:161:14 [sample] 89bpm Normal rmssd=24 pnn50=7 steps=828 mot=0
+[17:20:34] pkjs> Cardia:161:14 [sample] 87bpm Normal rmssd=25 pnn50=7 steps=828 mot=0
+[17:20:50] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=26 pnn50=11 steps=828 mot=0
+[17:21:05] pkjs> Cardia:161:14 [sample] 88bpm Normal rmssd=32 pnn50=16 steps=828 mot=0
+[17:21:20] pkjs> Cardia:161:14 [sample] 100bpm Normal rmssd=24 pnn50=9 steps=828 mot=0
+[17:21:36] pkjs> Cardia:161:14 [sample] 100bpm Normal rmssd=32 pnn50=15 steps=828 mot=0
+[17:21:52] pkjs> Cardia:161:14 [sample] 95bpm Normal rmssd=26 pnn50=8 steps=828 mot=0
+[17:22:07] pkjs> Cardia:161:14 [sample] 98bpm Normal rmssd=34 pnn50=14 steps=828 mot=0
+[17:22:23] pkjs> Cardia:161:14 [sample] 99bpm Normal rmssd=27 pnn50=8 steps=828 mot=0
+[17:22:38] pkjs> Cardia:161:14 [sample] 94bpm Normal rmssd=35 pnn50=14 steps=828 mot=0
+[17:22:39] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
+[17:22:39] ocess_manager.c:487> Heap Usage for Worker <Cardia>: Total Size <4752B> Used <2116B> Still allocated <0B>

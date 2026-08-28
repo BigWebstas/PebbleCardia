@@ -347,14 +347,21 @@ Pebble.addEventListener('showConfiguration', function () {
 'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
 '</style></head><body>' +
 '<div class="bar">' +
-'<button onclick="cp(\'md\')">Copy report (Markdown)</button>' +
-'<button onclick="cp(\'json\')">Copy raw data (JSON)</button>' +
+'<button onclick="openViewer()">Save / Share report</button>' +
+'<button onclick="cp(\'md\')">Copy Markdown</button>' +
+'<button onclick="cp(\'json\')">Copy JSON</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
-'<p class="hint">This settings screen can\'t save files, so <b>copy</b> the ' +
-'report and paste it into a Markdown app (Joplin, Obsidian, Google Keep…). ' +
-'For automatic capture, set a sync URL below.</p>' +
+'<p class="hint">This settings screen can\'t save files. <b>Copy</b> pastes ' +
+'the report straight into a Markdown app (Joplin, Obsidian, Keep…). ' +
+'<b>Save / Share</b> opens the report in a browser (needs a viewer URL below) ' +
+'where you can save the file or use the share sheet.</p>' +
+'<label>Report viewer URL (optional)</label>' +
+'<input id="vurl" placeholder="https://…/report-viewer.html">' +
+'<p class="hint">Host <code>tools/report-viewer.html</code> anywhere static ' +
+'(Netlify Drop, GitHub Pages…) and paste its https URL here. The report goes ' +
+'in the link fragment — never sent to a server.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -370,6 +377,7 @@ Pebble.addEventListener('showConfiguration', function () {
 'var g=function(i){return document.getElementById(i);};' +
 'g("raw").value=MD;' +
 'g("url").value=CFG.syncUrl||"";' +
+'g("vurl").value=CFG.viewerUrl||"";' +
 'function note(t){g("msg").textContent=t;}' +
 'function cp(kind){' +
 '  var r=g("raw");r.value=(kind==="json"?JD:MD);r.focus();r.select();' +
@@ -378,10 +386,17 @@ Pebble.addEventListener('showConfiguration', function () {
 '  note(ok?("Copied the "+kind.toUpperCase()+" — paste it into your notes app.")' +
 '         :"Couldn\'t auto-copy. The text is selected below — copy it manually.");' +
 '}' +
+'function openViewer(){' +
+'  var u=g("vurl").value.trim();' +
+'  if(!u){note("Add a viewer URL below first (host tools/report-viewer.html).");return;}' +
+'  var j=(JD.length<150000)?JD:"";' +   // keep the URL sane; big JSON -> Copy JSON instead
+'  var payload=btoa(unescape(encodeURIComponent(JSON.stringify({md:MD,json:j,name:"cardia"}))));' +
+'  location.href=u+(u.indexOf("#")<0?"#":"")+encodeURIComponent(payload);' +
+'}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
 '  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
 'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
-'  syncUrl:g("url").value.trim()}));}' +
+'  syncUrl:g("url").value.trim(),viewerUrl:g("vurl").value.trim()}));}' +
 'try{' +
 '  mermaid.initialize({startOnLoad:false,theme:"neutral"});' +
 '  var html=marked.parse(MD);' +
@@ -408,10 +423,12 @@ Pebble.addEventListener('webviewclosed', function (e) {
     return;
   }
 
-  if ('syncUrl' in r) {
+  if ('syncUrl' in r || 'viewerUrl' in r) {
     var cfg = getConfig();
-    cfg.syncUrl = r.syncUrl || '';
+    if ('syncUrl' in r) cfg.syncUrl = r.syncUrl || '';
+    if ('viewerUrl' in r) cfg.viewerUrl = r.viewerUrl || '';
     save('config', cfg);
-    console.log('sync URL ' + (cfg.syncUrl ? 'set' : 'cleared'));
+    console.log('config: sync=' + (cfg.syncUrl ? 'set' : 'off') +
+                ' viewer=' + (cfg.viewerUrl ? 'set' : 'off'));
   }
 });
