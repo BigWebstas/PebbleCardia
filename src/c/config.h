@@ -21,14 +21,15 @@
 #endif
 
 // --- Ring buffers -------------------------------------------------------------
-// The worker runs in 12 KB of RAM, so it keeps only what the analysis window
-// needs. The app keeps a longer BPM history to draw the graph.
+// The worker runs in 12 KB of RAM, so it keeps a smaller beat-interval window.
+// The BPM graph ring is just a byte per sample now, so both keep the full 180
+// - the worker persists it (PKEY_BPM_HISTORY) so the app's graph survives
+// leaving/returning while the worker runs.
+#define BPM_BUF_LEN          180
 #if defined(CARDIA_WORKER)
-#define RR_BUF_LEN           72    // ~90 s of beats is plenty; worker RAM is tight
-#define BPM_BUF_LEN          24
+#define RR_BUF_LEN           72
 #else
 #define RR_BUF_LEN           96
-#define BPM_BUF_LEN          180   // heart-rate samples kept for the graph
 #endif
 
 // --- Beat-interval sanity window (ms) -------------------------------------
@@ -66,6 +67,7 @@ static const uint8_t SENS_SCORE_THRESHOLD[3] = { 75, 60, 45 };
 #define PKEY_EPISODE_COUNT    2
 #define PKEY_EPISODE_BLOB     3
 #define PKEY_PENDING_ALERT    4   // worker -> app: an episode opened while app was closed
+#define PKEY_BPM_HISTORY      5   // rolling BPM graph ring, so the graph survives restarts
 
 // --- AppMessage MSG_KIND (watch -> phone) -------------------------------
 #define MSG_KIND_STATUS      0

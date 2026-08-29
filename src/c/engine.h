@@ -25,6 +25,10 @@ void engine_apply_sample_rate(void); // re-read Settings.sample_rate_s and apply
 
 void engine_get_snapshot(MonitorSnapshot *out);
 
+// Save the BPM graph ring to persistent storage (also done automatically on
+// stop and every ~30 s while running).
+void engine_persist_bpm_history(void);
+
 #ifdef CARDIA_DEBUG
 void engine_debug_inject_irregular(void);
 #endif

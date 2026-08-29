@@ -123,6 +123,21 @@ static bool is_abnormal(RhythmStatus s) {
   return s == RHYTHM_ELEVATED || s == RHYTHM_LOW || s == RHYTHM_IRREGULAR;
 }
 
+// --- BPM graph history: persisted so the graph survives the app being closed
+//     (especially in background mode, where the worker owns the real history) --
+static void bpm_history_load(void) {
+  static uint8_t buf[BPM_BUF_LEN];
+  if (!persist_exists(PKEY_BPM_HISTORY)) return;
+  int n = persist_read_data(PKEY_BPM_HISTORY, buf, sizeof(buf));
+  if (n > 0) analysis_bpm_restore(buf, n);
+}
+
+void engine_persist_bpm_history(void) {
+  static uint8_t buf[BPM_BUF_LEN];
+  int n = analysis_bpm_series(buf, BPM_BUF_LEN);
+  if (n > 0) persist_write_data(PKEY_BPM_HISTORY, buf, n);
+}
+
 // ---------------------------------------------------------------------------
 static void tick(void *context) {
   s_tick = NULL;
@@ -187,6 +202,10 @@ static void tick(void *context) {
 
   if (s_cb.on_tick) s_cb.on_tick(&s_snap);
 
+  // Persist the graph history every ~30 s so a returning app picks it up.
+  static int persist_div = 0;
+  if (++persist_div >= 10) { persist_div = 0; engine_persist_bpm_history(); }
+
   s_tick = app_timer_register(TICK_MS, tick, NULL);
 }
 
@@ -224,6 +243,7 @@ void engine_start(void) {
   if (s_running) return;
   s_running = true;
   analysis_reset();
+  bpm_history_load();           // keep the graph populated across restarts
   s_candidate = RHYTHM_NORMAL;
   s_ep_active = false;
   s_motion_mg = 0;
@@ -239,6 +259,7 @@ void engine_start(void) {
 void engine_stop(void) {
   if (!s_running) return;
   s_running = false;
+  engine_persist_bpm_history();
   if (s_tick) { app_timer_cancel(s_tick); s_tick = NULL; }
   health_service_set_heart_rate_sample_period(0);
   health_service_set_hrv_sample_period(0);

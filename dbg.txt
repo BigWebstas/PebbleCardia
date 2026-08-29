@@ -111,3 +111,75 @@
 [17:22:38] pkjs> Cardia:161:14 [sample] 94bpm Normal rmssd=35 pnn50=14 steps=828 mot=0
 [17:22:39] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
 [17:22:39] ocess_manager.c:487> Heap Usage for Worker <Cardia>: Total Size <4752B> Used <2116B> Still allocated <0B>
+[17:22:42] pkjs> Cardia:? Pebble JS Bridge initialized.
+[17:22:42] pkjs> Cardia:140:12 Cardia JS ready. samples=284 episodes=11
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787955969,"startISO":"2026-08-28T22:26:09.000Z","duration_s":36,"ongoing":false,"type":"Irregular","hr_min":87,"hr_peak":91,"score":82}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787955021,"startISO":"2026-08-28T22:10:21.000Z","duration_s":28,"ongoing":false,"type":"Irregular","hr_min":93,"hr_peak":93,"score":67}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787953510,"startISO":"2026-08-28T21:45:10.000Z","duration_s":52,"ongoing":false,"type":"Elevated","hr_min":120,"hr_peak":122,"score":25}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787953275,"startISO":"2026-08-28T21:41:15.000Z","duration_s":41,"ongoing":false,"type":"Elevated","hr_min":121,"hr_peak":122,"score":11}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787952914,"startISO":"2026-08-28T21:35:14.000Z","duration_s":327,"ongoing":false,"type":"Elevated","hr_min":120,"hr_peak":126,"score":36}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787950354,"startISO":"2026-08-28T20:52:34.000Z","duration_s":56,"ongoing":false,"type":"Irregular","hr_min":94,"hr_peak":94,"score":84}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787949595,"startISO":"2026-08-28T20:39:55.000Z","duration_s":20,"ongoing":false,"type":"Irregular","hr_min":79,"hr_peak":81,"score":91}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787949563,"startISO":"2026-08-28T20:39:23.000Z","duration_s":16,"ongoing":false,"type":"Irregular","hr_min":85,"hr_peak":86,"score":100}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787949492,"startISO":"2026-08-28T20:38:12.000Z","duration_s":15,"ongoing":false,"type":"Irregular","hr_min":88,"hr_peak":88,"score":100}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787948232,"startISO":"2026-08-28T20:17:12.000Z","duration_s":65,"ongoing":false,"type":"Irregular","hr_min":80,"hr_peak":90,"score":100}
+[17:22:42] pkjs> Cardia:182:14 [episode] {"start":1787948076,"startISO":"2026-08-28T20:14:36.000Z","duration_s":81,"ongoing":false,"type":"Irregular","hr_min":78,"hr_peak":81,"score":100}
+[17:22:57] pkjs> Cardia:161:14 [sample] 0bpm No signal rmssd=0 pnn50=0 steps=828 mot=0
+[17:23:12] pkjs> Cardia:161:14 [sample] 78bpm Normal rmssd=153 pnn50=52 steps=828 mot=0
+[17:23:28] pkjs> Cardia:161:14 [sample] 75bpm Normal rmssd=210 pnn50=54 steps=828 mot=0
+[17:23:44] pkjs> Cardia:161:14 [sample] 84bpm Normal rmssd=190 pnn50=52 steps=828 mot=0
+[17:23:59] pkjs> Cardia:161:14 [sample] 85bpm Normal rmssd=198 pnn50=49 steps=828 mot=0
+[17:24:02] ocess_manager.c:487> Heap Usage for App <Cardia>: Total Size <112456B> Used <2728B> Still allocated <104B>
+[17:24:04] essage_outbox.c:72> app_message_open() called with app_message_outbox_size_maximum().
+[17:24:04] essage_outbox.c:73> This consumes 8200 bytes of heap memory, potentially more in the future!
+[17:24:04] message_inbox.c:16> app_message_open() called with app_message_inbox_size_maximum().
+[17:24:04] message_inbox.c:17> This consumes 8200 bytes of heap memory, potentially more in the future!
+[17:24:04] pkjs> xDrip Watch Face:? Pebble JS Bridge initialized.
+[17:55:31] app_timer.c:35> Timer 21013 does not exist
+Exception in thread PebbleConnection:
+Traceback (most recent call last):
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_socket.py", line 127, in recv
+    bytes_ = _recv()
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_socket.py", line 99, in _recv
+    return sock.recv(bufsize)
+           ~~~~~~~~~^^^^^^^^^
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/webstas/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/threading.py", line 1044, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "/home/webstas/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/threading.py", line 995, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/libpebble2/communication/__init__.py", line 88, in run_sync
+    self.pump_reader()
+    ~~~~~~~~~~~~~~~~^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/libpebble2/communication/__init__.py", line 73, in pump_reader
+    origin, message = self.transport.read_packet()
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/libpebble2/communication/transports/websocket/__init__.py", line 63, in read_packet
+    opcode, message = self.ws.recv_data()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_core.py", line 423, in recv_data
+    opcode, frame = self.recv_data_frame(control_frame)
+                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_core.py", line 444, in recv_data_frame
+    frame = self.recv_frame()
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_core.py", line 485, in recv_frame
+    return self.frame_buffer.recv_frame()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_abnf.py", line 375, in recv_frame
+    self.recv_header()
+    ~~~~~~~~~~~~~~~~^^
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_abnf.py", line 329, in recv_header
+    header = self.recv_strict(2)
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_abnf.py", line 418, in recv_strict
+    bytes_ = self.recv(min(16384, shortage))
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_core.py", line 581, in _recv
+    return recv(self.sock, bufsize)
+  File "/home/webstas/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/websocket/_socket.py", line 129, in recv
+    raise WebSocketTimeoutException("Connection timed out")
+websocket._exceptions.WebSocketTimeoutException: Connection timed out

@@ -40,3 +40,7 @@ bool analysis_compute(time_t now, AnalysisResult *out);
 // Copy the last `max` bpm samples (oldest first) into `dst`.
 // Returns the count written.
 int analysis_bpm_series(uint8_t *dst, int max);
+
+// Seed the graph ring from a saved series (oldest first) - keeps the graph
+// populated across app restarts and when attaching to the background worker.
+void analysis_bpm_restore(const uint8_t *src, int n);

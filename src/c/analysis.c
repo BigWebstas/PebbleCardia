@@ -7,9 +7,8 @@ static RRSample s_rr[RR_BUF_LEN];
 static int s_rr_head;   // next write slot
 static int s_rr_count;
 
-// --- bpm ring (for the graph) --------------------------------------------
-typedef struct { uint32_t t; uint8_t bpm; } BpmSample;
-static BpmSample s_bpm[BPM_BUF_LEN];
+// --- bpm ring (for the graph) - just the values, oldest..newest ----------
+static uint8_t s_bpm[BPM_BUF_LEN];
 static int s_bpm_head;
 static int s_bpm_count;
 
@@ -72,7 +71,7 @@ uint8_t analysis_signal_quality(void) {
 
 void analysis_add_bpm(uint8_t bpm, time_t now) {
   if (bpm == 0) return;
-  s_bpm[s_bpm_head] = (BpmSample){ .bpm = bpm, .t = now };
+  s_bpm[s_bpm_head] = bpm;
   s_bpm_head = (s_bpm_head + 1) % BPM_BUF_LEN;
   if (s_bpm_count < BPM_BUF_LEN) s_bpm_count++;
   s_last_bpm = bpm;
@@ -178,7 +177,17 @@ int analysis_bpm_series(uint8_t *dst, int max) {
   int n = s_bpm_count < max ? s_bpm_count : max;
   int start = (s_bpm_head - n + BPM_BUF_LEN * 2) % BPM_BUF_LEN;
   for (int i = 0; i < n; i++) {
-    dst[i] = s_bpm[(start + i) % BPM_BUF_LEN].bpm;
+    dst[i] = s_bpm[(start + i) % BPM_BUF_LEN];
   }
   return n;
+}
+
+// Seed the graph ring from a saved series (oldest first). Used to keep the
+// graph populated across app restarts / when attaching to the worker.
+void analysis_bpm_restore(const uint8_t *src, int n) {
+  if (n > BPM_BUF_LEN) { src += (n - BPM_BUF_LEN); n = BPM_BUF_LEN; }
+  for (int i = 0; i < n; i++) s_bpm[i] = src[i];
+  s_bpm_head = n % BPM_BUF_LEN;
+  s_bpm_count = n;
+  if (n > 0) s_last_bpm = src[n - 1];
 }

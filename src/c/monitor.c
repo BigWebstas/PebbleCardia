@@ -103,10 +103,18 @@ static void notify_worker(uint8_t type) {
   app_worker_send_message(type, &m);
 }
 
+static void bpm_history_load(void) {
+  static uint8_t buf[BPM_BUF_LEN];
+  if (!persist_exists(PKEY_BPM_HISTORY)) return;
+  int n = persist_read_data(PKEY_BPM_HISTORY, buf, sizeof(buf));
+  if (n > 0) analysis_bpm_restore(buf, n);
+}
+
 static void go_attached(void) {
   if (engine_running()) engine_stop();
   if (!s_attached) {
     analysis_reset();
+    bpm_history_load();          // seed the graph from the worker's saved history
     app_worker_message_subscribe(worker_message);
     s_attached = true;
   }
@@ -119,6 +127,7 @@ void monitor_init(void) {
 }
 
 void monitor_deinit(void) {
+  engine_persist_bpm_history();   // so the graph is there next launch
   if (engine_running()) engine_stop();
   if (s_attached) { app_worker_message_unsubscribe(); s_attached = false; }
 }
