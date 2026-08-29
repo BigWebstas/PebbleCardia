@@ -389,10 +389,9 @@ Pebble.addEventListener('showConfiguration', function () {
 '}' +
 'function openViewer(){' +
 '  var u=g("vurl").value.trim();' +
-'  if(!u){note("Add a viewer URL below first (host tools/report-viewer.html).");return;}' +
-'  var j=(JD.length<150000)?JD:"";' +   // keep the URL sane; big JSON -> Copy JSON instead
-'  var payload=btoa(unescape(encodeURIComponent(JSON.stringify({md:MD,json:j,name:"cardia"}))));' +
-'  location.href=u+(u.indexOf("#")<0?"#":"")+encodeURIComponent(payload);' +
+'  if(!u){note("Add a viewer URL below first.");return;}' +
+'  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
+'    action:"viewer",viewerUrl:u,syncUrl:g("url").value.trim()}));' +
 '}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
 '  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
@@ -432,4 +431,19 @@ Pebble.addEventListener('webviewclosed', function (e) {
     console.log('config: sync=' + (cfg.syncUrl ? 'set' : 'off') +
                 ' viewer=' + (cfg.viewerUrl ? 'set' : 'off'));
   }
+
+  if (r.action === 'viewer' && r.viewerUrl) {
+    var j = jsonExport();
+    if (j.length > 150000) j = '';   // keep the URL sane
+    var payload = btoa(unescape(encodeURIComponent(
+      JSON.stringify({ md: buildMarkdown(), json: j, name: 'cardia' }))));
+    var url = r.viewerUrl + (r.viewerUrl.indexOf('#') < 0 ? '#' : '') + encodeURIComponent(payload);
+    console.log('opening viewer (' + url.length + ' chars)');
+    Pebble.openURL(url);
+  }
 });
+
+function jsonExport() {
+  return JSON.stringify({ generated: new Date().toISOString(),
+                          samples: getSamples(), episodes: getEpisodes() }, null, 1);
+}
