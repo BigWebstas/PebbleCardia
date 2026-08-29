@@ -353,8 +353,9 @@ Pebble.addEventListener('showConfiguration', function () {
 '</div>' +
 '<div id="msg" class="hint"></div>' +
 '<p class="hint">This settings screen can\'t save files. <b>Copy Markdown</b> ' +
-'copies the whole report — paste it into a Markdown app (Joplin, Obsidian, ' +
-'Keep…), where the charts render. <b>Copy JSON</b> copies the raw data.</p>' +
+'copies the whole report — paste it into <b>Obsidian</b>, <b>Joplin</b> or ' +
+'any Markdown app with <b>Mermaid</b> support and the HR / HRV / steps / ' +
+'episode charts render. <b>Copy JSON</b> copies the raw data.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
