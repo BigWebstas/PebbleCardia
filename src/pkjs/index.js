@@ -1,9 +1,9 @@
 // Cardia - phone side.
 //
-// Keeps a rolling log of heart-rate/HRV samples and rhythm episodes from the
-// watch in localStorage. Can stream each record to a URL you configure, and
-// builds a Markdown report (with Mermaid charts) you can save or share from the
-// configuration page.
+// Keeps a rolling log of heart-rate/HRV/step samples and rhythm episodes from
+// the watch in localStorage. The configuration page renders a Markdown report
+// (Mermaid charts) you copy into a notes app, and can stream each record to a
+// URL you configure.
 
 var STATUS = 0;
 var EPISODE = 1;
@@ -11,7 +11,6 @@ var RHYTHM = ['No signal', 'Normal', 'Elevated', 'Low', 'Irregular'];
 
 var MAX_SAMPLES = 1500;   // ~6 h at one sample / 15 s
 var MAX_EPISODES = 200;
-var DEFAULT_VIEWER = 'https://webstas.net/report-viewer.html';
 
 // --- storage --------------------------------------------------------------
 function load(key, dflt) {
@@ -350,19 +349,12 @@ Pebble.addEventListener('showConfiguration', function () {
 '<div class="bar">' +
 '<button onclick="cp(\'md\')">Copy Markdown</button>' +
 '<button onclick="cp(\'json\')">Copy JSON</button>' +
-'<button onclick="cpLink()">Copy viewer link</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
-'<p class="hint">This settings screen can\'t save files or open a browser. ' +
-'<b>Copy Markdown</b> pastes straight into a Markdown app (Joplin, Obsidian, ' +
-'Keep…). <b>Copy viewer link</b> gives you a URL — open it in Chrome to see ' +
-'the report rendered and Save the .md or use the share sheet from there.</p>' +
-'<label>Report viewer URL</label>' +
-'<input id="vurl" placeholder="https://…/report-viewer.html">' +
-'<p class="hint">A copy of <code>tools/report-viewer.html</code> (default: ' +
-'webstas.net). The report rides in the link fragment — never sent to a ' +
-'server.</p>' +
+'<p class="hint">This settings screen can\'t save files. <b>Copy Markdown</b> ' +
+'copies the whole report — paste it into a Markdown app (Joplin, Obsidian, ' +
+'Keep…), where the charts render. <b>Copy JSON</b> copies the raw data.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -378,7 +370,6 @@ Pebble.addEventListener('showConfiguration', function () {
 'var g=function(i){return document.getElementById(i);};' +
 'g("raw").value=MD;' +
 'g("url").value=CFG.syncUrl||"";' +
-'g("vurl").value=(CFG.viewerUrl!=null?CFG.viewerUrl:' + JSON.stringify(DEFAULT_VIEWER) + ');' +
 'function note(t){g("msg").textContent=t;}' +
 'function cp(kind){' +
 '  var r=g("raw");r.value=(kind==="json"?JD:MD);r.focus();r.select();' +
@@ -387,22 +378,10 @@ Pebble.addEventListener('showConfiguration', function () {
 '  note(ok?("Copied the "+kind.toUpperCase()+" — paste it into your notes app.")' +
 '         :"Couldn\'t auto-copy. The text is selected below — copy it manually.");' +
 '}' +
-'function cpLink(){' +
-'  var u=g("vurl").value.trim();' +
-'  if(!u){note("Set a viewer URL below first.");return;}' +
-'  var j=(JD.length<40000)?JD:"";' +   // include raw data too when the link stays short
-'  var p=btoa(unescape(encodeURIComponent(JSON.stringify({md:MD,json:j,name:"cardia"}))));' +
-'  var link=u+(u.indexOf("#")<0?"#":"")+encodeURIComponent(p);' +
-'  var r=g("raw");r.value=link;r.focus();r.select();' +
-'  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
-'  var ok=false;try{ok=document.execCommand("copy");}catch(e){}' +
-'  note(ok?("Copied a "+link.length+"-char link — open it in Chrome.")' +
-'         :"Link is in the box below — copy it and open in Chrome.");' +
-'}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
 '  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
 'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
-'  syncUrl:g("url").value.trim(),viewerUrl:g("vurl").value.trim()}));}' +
+'  syncUrl:g("url").value.trim()}));}' +
 'try{' +
 '  mermaid.initialize({startOnLoad:false,theme:"neutral"});' +
 '  var html=marked.parse(MD);' +
@@ -429,13 +408,10 @@ Pebble.addEventListener('webviewclosed', function (e) {
     return;
   }
 
-  if ('syncUrl' in r || 'viewerUrl' in r) {
+  if ('syncUrl' in r) {
     var cfg = getConfig();
-    if ('syncUrl' in r) cfg.syncUrl = r.syncUrl || '';
-    if ('viewerUrl' in r) cfg.viewerUrl = r.viewerUrl || '';
+    cfg.syncUrl = r.syncUrl || '';
     save('config', cfg);
-    console.log('config: sync=' + (cfg.syncUrl ? 'set' : 'off') +
-                ' viewer=' + (cfg.viewerUrl ? 'set' : 'off'));
+    console.log('sync URL ' + (cfg.syncUrl ? 'set' : 'cleared'));
   }
-
 });
