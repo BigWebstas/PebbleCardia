@@ -11,6 +11,7 @@ var RHYTHM = ['No signal', 'Normal', 'Elevated', 'Low', 'Irregular'];
 
 var MAX_SAMPLES = 1500;   // ~6 h at one sample / 15 s
 var MAX_EPISODES = 200;
+var DEFAULT_VIEWER = 'https://webstas.net/report-viewer.html';
 
 // --- storage --------------------------------------------------------------
 function load(key, dflt) {
@@ -355,13 +356,13 @@ Pebble.addEventListener('showConfiguration', function () {
 '<div id="msg" class="hint"></div>' +
 '<p class="hint">This settings screen can\'t save files. <b>Copy</b> pastes ' +
 'the report straight into a Markdown app (Joplin, Obsidian, Keep…). ' +
-'<b>Save / Share</b> opens the report in a browser (needs a viewer URL below) ' +
-'where you can save the file or use the share sheet.</p>' +
-'<label>Report viewer URL (optional)</label>' +
+'<b>Save / Share</b> opens it in the viewer page below, where you can save ' +
+'the file or use the share sheet.</p>' +
+'<label>Report viewer URL</label>' +
 '<input id="vurl" placeholder="https://…/report-viewer.html">' +
-'<p class="hint">Host <code>tools/report-viewer.html</code> anywhere static ' +
-'(Netlify Drop, GitHub Pages…) and paste its https URL here. The report goes ' +
-'in the link fragment — never sent to a server.</p>' +
+'<p class="hint">A copy of <code>tools/report-viewer.html</code>. The report ' +
+'travels in the link fragment — never sent to a server. Clear this field to ' +
+'disable Save / Share.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -377,7 +378,7 @@ Pebble.addEventListener('showConfiguration', function () {
 'var g=function(i){return document.getElementById(i);};' +
 'g("raw").value=MD;' +
 'g("url").value=CFG.syncUrl||"";' +
-'g("vurl").value=CFG.viewerUrl||"";' +
+'g("vurl").value=(CFG.viewerUrl!=null?CFG.viewerUrl:' + JSON.stringify(DEFAULT_VIEWER) + ');' +
 'function note(t){g("msg").textContent=t;}' +
 'function cp(kind){' +
 '  var r=g("raw");r.value=(kind==="json"?JD:MD);r.focus();r.select();' +
