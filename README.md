@@ -51,6 +51,14 @@ the default worker, which PebbleOS relaunches at boot until you turn it off.
 - **Down** – settings (background monitor, alerts, sensitivity, thresholds, sample rate, about/safety)
 - **Select** – cycle sample rate (Auto → 1s → 2s → 5s → 10s)
 
+### Settings menu
+
+Dark theme, custom-drawn rows. Each row has a coloured left stripe and value
+line keyed to its state: **green** = on / worker running, **grey** = off,
+**yellow** = starting / pending (and the About row), **cyan** = numeric
+settings (sensitivity, rate thresholds, sample rate). The selected row is a
+Folly-pink highlight bar. The About & safety screen is white-on-black.
+
 ## Build
 
 ```sh
