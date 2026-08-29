@@ -348,21 +348,21 @@ Pebble.addEventListener('showConfiguration', function () {
 'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
 '</style></head><body>' +
 '<div class="bar">' +
-'<button onclick="openViewer()">Save / Share report</button>' +
 '<button onclick="cp(\'md\')">Copy Markdown</button>' +
 '<button onclick="cp(\'json\')">Copy JSON</button>' +
+'<button onclick="cpLink()">Copy viewer link</button>' +
 '<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
-'<p class="hint">This settings screen can\'t save files. <b>Copy</b> pastes ' +
-'the report straight into a Markdown app (Joplin, Obsidian, Keep…). ' +
-'<b>Save / Share</b> opens it in the viewer page below, where you can save ' +
-'the file or use the share sheet.</p>' +
+'<p class="hint">This settings screen can\'t save files or open a browser. ' +
+'<b>Copy Markdown</b> pastes straight into a Markdown app (Joplin, Obsidian, ' +
+'Keep…). <b>Copy viewer link</b> gives you a URL — open it in Chrome to see ' +
+'the report rendered and Save the .md or use the share sheet from there.</p>' +
 '<label>Report viewer URL</label>' +
 '<input id="vurl" placeholder="https://…/report-viewer.html">' +
-'<p class="hint">A copy of <code>tools/report-viewer.html</code>. The report ' +
-'travels in the link fragment — never sent to a server. Clear this field to ' +
-'disable Save / Share.</p>' +
+'<p class="hint">A copy of <code>tools/report-viewer.html</code> (default: ' +
+'webstas.net). The report rides in the link fragment — never sent to a ' +
+'server.</p>' +
 '<label>Live sync URL (optional)</label>' +
 '<input id="url" placeholder="https://script.google.com/…/exec">' +
 '<p class="hint">Every sample &amp; episode is POSTed here as JSON. Ready-made ' +
@@ -387,11 +387,17 @@ Pebble.addEventListener('showConfiguration', function () {
 '  note(ok?("Copied the "+kind.toUpperCase()+" — paste it into your notes app.")' +
 '         :"Couldn\'t auto-copy. The text is selected below — copy it manually.");' +
 '}' +
-'function openViewer(){' +
+'function cpLink(){' +
 '  var u=g("vurl").value.trim();' +
-'  if(!u){note("Add a viewer URL below first.");return;}' +
-'  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
-'    action:"viewer",viewerUrl:u,syncUrl:g("url").value.trim()}));' +
+'  if(!u){note("Set a viewer URL below first.");return;}' +
+'  var j=(JD.length<40000)?JD:"";' +   // include raw data too when the link stays short
+'  var p=btoa(unescape(encodeURIComponent(JSON.stringify({md:MD,json:j,name:"cardia"}))));' +
+'  var link=u+(u.indexOf("#")<0?"#":"")+encodeURIComponent(p);' +
+'  var r=g("raw");r.value=link;r.focus();r.select();' +
+'  try{r.setSelectionRange(0,r.value.length);}catch(e){}' +
+'  var ok=false;try{ok=document.execCommand("copy");}catch(e){}' +
+'  note(ok?("Copied a "+link.length+"-char link — open it in Chrome.")' +
+'         :"Link is in the box below — copy it and open in Chrome.");' +
 '}' +
 'function clearData(){if(confirm("Delete all stored samples and episodes on the phone?"))' +
 '  location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({clear:1}));}' +
@@ -432,18 +438,4 @@ Pebble.addEventListener('webviewclosed', function (e) {
                 ' viewer=' + (cfg.viewerUrl ? 'set' : 'off'));
   }
 
-  if (r.action === 'viewer' && r.viewerUrl) {
-    var j = jsonExport();
-    if (j.length > 150000) j = '';   // keep the URL sane
-    var payload = btoa(unescape(encodeURIComponent(
-      JSON.stringify({ md: buildMarkdown(), json: j, name: 'cardia' }))));
-    var url = r.viewerUrl + (r.viewerUrl.indexOf('#') < 0 ? '#' : '') + encodeURIComponent(payload);
-    console.log('opening viewer (' + url.length + ' chars)');
-    Pebble.openURL(url);
-  }
 });
-
-function jsonExport() {
-  return JSON.stringify({ generated: new Date().toISOString(),
-                          samples: getSamples(), episodes: getEpisodes() }, null, 1);
-}

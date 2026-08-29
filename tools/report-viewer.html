@@ -132,6 +132,10 @@ function copy(kind) {
   }
   MD = data.md; JD = data.json || ""; NAME = data.name || "cardia-report";
   document.getElementById("raw").value = MD;
+  if (!JD) {
+    var jb = document.querySelector('button[onclick="save(\'json\')"]');
+    if (jb) jb.remove();
+  }
 
   try {
     mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "loose" });
