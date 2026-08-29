@@ -6,6 +6,13 @@
 
 enum { ROW_BACKGROUND, ROW_ALERTS, ROW_SENS, ROW_TACHY, ROW_BRADY, ROW_RATE, ROW_ABOUT, ROW_COUNT };
 
+#define COL_BG        GColorBlack
+#define COL_HILITE    GColorFolly
+#define COL_ACCENT    GColorVividCerulean
+#define COL_ON        GColorIslamicGreen
+#define COL_PENDING   GColorChromeYellow
+#define COL_OFF       GColorLightGray
+
 static Window *s_window;
 static MenuLayer *s_menu;
 static Window *s_about;
@@ -31,41 +38,69 @@ static const char s_about_body[] =
   "irregular-rhythm flag needs a clean reading held for ~25 s.";
 
 static uint16_t get_num_rows(MenuLayer *m, uint16_t s, void *c) { return ROW_COUNT; }
-static int16_t cell_height(MenuLayer *m, MenuIndex *i, void *c) { return 44; }
+static int16_t cell_height(MenuLayer *m, MenuIndex *i, void *c) { return 46; }
+
+// One row: coloured left stripe, white title, state-coloured value line.
+static void row(GContext *ctx, const Layer *cell, const char *title,
+                const char *value, GColor accent) {
+  GRect b = layer_get_bounds(cell);
+  bool sel = menu_cell_layer_is_highlighted(cell);
+
+  if (!sel) {
+    graphics_context_set_fill_color(ctx, accent);
+    graphics_fill_rect(ctx, GRect(0, 0, 4, b.size.h), 0, GCornerNone);
+  }
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(ctx, title, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
+                     GRect(11, 2, b.size.w - 16, 22),
+                     GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  if (value) {
+    graphics_context_set_text_color(ctx, sel ? GColorWhite : accent);
+    graphics_draw_text(ctx, value, fonts_get_system_font(FONT_KEY_GOTHIC_14),
+                       GRect(11, 24, b.size.w - 16, 18),
+                       GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  }
+}
 
 static void draw_row(GContext *ctx, const Layer *cell, MenuIndex *idx, void *c) {
   Settings *cfg = settings_get();
   char val[20];
   switch (idx->row) {
-    case ROW_BACKGROUND:
+    case ROW_BACKGROUND: {
+      GColor accent;
       if (!cfg->background_on) {
         strncpy(s_bg_sub, "Off - app must be open", sizeof(s_bg_sub));
+        accent = COL_OFF;
       } else if (monitor_background_active()) {
         strncpy(s_bg_sub, "On - worker running", sizeof(s_bg_sub));
+        accent = COL_ON;
       } else {
         strncpy(s_bg_sub, "On - starting...", sizeof(s_bg_sub));
+        accent = COL_PENDING;
       }
-      menu_cell_basic_draw(ctx, cell, "Background monitor", s_bg_sub, NULL);
+      row(ctx, cell, "Background monitor", s_bg_sub, accent);
       break;
+    }
     case ROW_ALERTS:
-      menu_cell_basic_draw(ctx, cell, "Alerts", cfg->alerts_on ? "On" : "Off", NULL);
+      row(ctx, cell, "Alerts", cfg->alerts_on ? "On" : "Off",
+          cfg->alerts_on ? COL_ON : COL_OFF);
       break;
     case ROW_SENS:
-      menu_cell_basic_draw(ctx, cell, "Sensitivity", settings_sensitivity_name(), NULL);
+      row(ctx, cell, "Sensitivity", settings_sensitivity_name(), COL_ACCENT);
       break;
     case ROW_TACHY:
       snprintf(val, sizeof(val), "%u bpm", cfg->tachy_bpm);
-      menu_cell_basic_draw(ctx, cell, "High-rate flag", val, NULL);
+      row(ctx, cell, "High-rate flag", val, COL_ACCENT);
       break;
     case ROW_BRADY:
       snprintf(val, sizeof(val), "%u bpm", cfg->brady_bpm);
-      menu_cell_basic_draw(ctx, cell, "Low-rate flag", val, NULL);
+      row(ctx, cell, "Low-rate flag", val, COL_ACCENT);
       break;
     case ROW_RATE:
-      menu_cell_basic_draw(ctx, cell, "Sample rate", settings_sample_rate_name(), NULL);
+      row(ctx, cell, "Sample rate", settings_sample_rate_name(), COL_ACCENT);
       break;
     case ROW_ABOUT:
-      menu_cell_basic_draw(ctx, cell, "About & safety", NULL, NULL);
+      row(ctx, cell, "About & safety", NULL, COL_PENDING);
       break;
   }
 }
@@ -73,9 +108,12 @@ static void draw_row(GContext *ctx, const Layer *cell, MenuIndex *idx, void *c) 
 static void about_load(Window *w) {
   Layer *root = window_get_root_layer(w);
   GRect b = layer_get_bounds(root);
+  window_set_background_color(w, GColorBlack);
   s_about_text = text_layer_create(GRect(6, 4, b.size.w - 12, b.size.h - 8));
   text_layer_set_text(s_about_text, s_about_body);
   text_layer_set_font(s_about_text, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_text_color(s_about_text, GColorWhite);
+  text_layer_set_background_color(s_about_text, GColorClear);
   // wrap in a scroll layer
   ScrollLayer *sl = scroll_layer_create(b);
   scroll_layer_set_click_config_onto_window(sl, w);
@@ -130,6 +168,7 @@ static void select_click(MenuLayer *m, MenuIndex *idx, void *ctx) {
 
 static void window_load(Window *w) {
   Layer *root = window_get_root_layer(w);
+  window_set_background_color(w, COL_BG);
   s_menu = menu_layer_create(layer_get_bounds(root));
   menu_layer_set_callbacks(s_menu, NULL, (MenuLayerCallbacks){
     .get_num_rows = get_num_rows,
@@ -137,6 +176,8 @@ static void window_load(Window *w) {
     .draw_row = draw_row,
     .select_click = select_click,
   });
+  menu_layer_set_normal_colors(s_menu, COL_BG, GColorWhite);
+  menu_layer_set_highlight_colors(s_menu, COL_HILITE, GColorWhite);
   menu_layer_set_click_config_onto_window(s_menu, w);
   layer_add_child(root, menu_layer_get_layer(s_menu));
 }
