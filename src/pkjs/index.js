@@ -7,6 +7,7 @@
 
 var STATUS = 0;
 var EPISODE = 1;
+var NOTIFY = 2;
 var RHYTHM = ['No signal', 'Normal', 'Elevated', 'Low', 'Irregular'];
 
 var MAX_SAMPLES = 1500;   // ~6 h at one sample / 15 s
@@ -48,8 +49,38 @@ Pebble.addEventListener('ready', function () {
   Pebble.sendAppMessage({ DUMP: 1 });
 });
 
+// A fresh episode the watch wants surfaced as a notification. pkjs can't run
+// while the Cardia app is closed, so the watch (foreground app, launched by the
+// background worker on an episode) asks us to post it here.
+function postNotification(d) {
+  var type = RHYTHM[d.STATUS] || 'Rhythm';
+  var title = 'Cardia — ' + type + ' rhythm';
+  var body;
+  if (d.STATUS === 4) {
+    body = 'Irregular beat pattern while you were at rest.';
+  } else if (d.STATUS === 2) {
+    body = 'Heart rate stayed high (peak ' + (d.EP_HR_PEAK || '?') + ' bpm) at rest.';
+  } else if (d.STATUS === 3) {
+    body = 'Heart rate stayed low (down to ' + (d.EP_HR_MIN || '?') + ' bpm).';
+  } else {
+    body = 'A rhythm episode was flagged.';
+  }
+  body += ' Not a diagnosis — open Cardia for the history.';
+  try {
+    Pebble.showSimpleNotificationOnPebble(title, body);
+    console.log('[notify] ' + title);
+  } catch (err) {
+    console.log('[notify] failed: ' + err);
+  }
+}
+
 Pebble.addEventListener('appmessage', function (e) {
   var d = e.payload;
+
+  if (d.MSG_KIND === NOTIFY) {
+    postNotification(d);
+    return;
+  }
 
   if (d.MSG_KIND === STATUS) {
     var s = {

@@ -3,6 +3,7 @@
 
 typedef struct __attribute__((__packed__)) {
   bool    alerts_on;
+  bool    notify_on;      // post a watch notification when an episode is flagged
   uint8_t sensitivity;    // 0 low / 1 medium / 2 high
   uint8_t tachy_bpm;
   uint8_t brady_bpm;
@@ -20,6 +21,7 @@ void settings_cycle_tachy(void);
 void settings_cycle_brady(void);
 void settings_cycle_sample_rate(void);
 void settings_toggle_alerts(void);
+void settings_toggle_notify(void);
 
 const char *settings_sensitivity_name(void);
 const char *settings_sample_rate_name(void);

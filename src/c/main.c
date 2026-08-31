@@ -19,6 +19,7 @@ static void init(void) {
   Episode pending;
   if (monitor_take_pending_alert(&pending)) {
     win_alert_push(&pending);
+    if (settings_get()->notify_on) comm_send_notify(&pending);
   }
 
   monitor_start();

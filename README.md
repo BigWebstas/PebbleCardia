@@ -22,12 +22,13 @@ exposes real HRV peak-to-peak intervals (`health_service_peek_hrv_ppi_ms`).
 | **Rate analysis** | Raw BPM (`HealthMetricHeartRateRawBPM`) is smoothed (EMA) and compared to user thresholds. Extremes only count when the accelerometer says you're still, so exertion isn't flagged. |
 | **Rhythm analysis** | Beat-to-beat intervals (PPI ≈ RR) go into a 90 s ring buffer. Each tick computes mean RR, SDNN, **RMSSD**, **pNN50**, CV and a turning-point ratio, combined into a 0–100 irregularity score. Sensitivity picks the score threshold (75 / 60 / 45). |
 | **Episodes** | A state machine confirms an abnormal state for 25 s before opening an episode (vibrate + on-watch banner + phone push), and needs 30 s of normal to close it. Peak/min HR and peak score are tracked across the episode. |
+| **Notification** | On a new episode the watch also asks `src/pkjs/index.js` to post a real notification card (`Pebble.showSimpleNotificationOnPebble`) to the watch's notification feed and the phone — it persists until dismissed. Independent of **Alerts** (vibrate + rhythm screen); either can be turned off in Settings. The background worker can't post notifications itself, so it launches the app, which sends the request; `comm.c` retries until the phone JS is up. |
 | **History** | Last 20 finalised episodes in persistent storage, with a detail card each. |
 | **Phone** | `src/pkjs/index.js` keeps a rolling log of HR/HRV/step samples (one per ~15 s) and rhythm episodes in `localStorage`. Each sample carries `bpm, RMSSD, pNN50, SDNN, motion` and cumulative `steps` today. On launch it asks the watch to replay every stored episode (`DUMP`), so episodes the background worker recorded while the app was closed still reach the phone. |
 | **Export** | The configuration page (Pebble app → Cardia → gear) builds a **Markdown report** with Mermaid charts (HR / RMSSD / pNN50 line charts, a steps bar chart, an episode Gantt + table) and renders it inline. The Core app's config web view can't save files or open a browser (verified via ADB — `Pebble.openURL`, `<a download>`, `navigator.share`, `intent:`, `window.open` are all inert there), so export is **Copy Markdown / Copy JSON** → paste into a notes app (Joplin, Obsidian, … — the charts render there). `tools/report-viewer.html` is a standalone page that renders a report from its URL fragment with working Save/Share — host it and open `…/report-viewer.html#<base64 report>` in a real browser. |
 | **Sync** | Optionally set a **sync URL** and every sample + episode is `POST`ed there as JSON as it arrives. `tools/cardia-sheet-sync.gs` is a ready-made Google Apps Script that appends each one to a Sheet. |
 | **Graph** | `graph.c` renders the live BPM trace with grid, threshold reference lines, a least-squares trend line and a current-value marker. |
-| **Background monitor** | Optional. A PebbleOS **AppWorker** (`worker_src/c/worker.c`) runs the same engine continuously — it keeps monitoring after you leave the app and is relaunched on reboot. On a confirmed episode it persists the episode, streams it to the app, and calls `worker_launch_app()` so you get a buzzing full-screen alert even if the app was closed. Toggle in Settings. |
+| **Background monitor** | Optional. A PebbleOS **AppWorker** (`worker_src/c/worker.c`) runs the same engine continuously — it keeps monitoring after you leave the app and is relaunched on reboot. On a confirmed episode it persists the episode, streams it to the app, and calls `worker_launch_app()` so you get a buzzing full-screen alert and/or a notification card even if the app was closed. Toggle in Settings. |
 
 ## Continuous background monitoring
 
@@ -48,7 +49,7 @@ the default worker, which PebbleOS relaunches at boot until you turn it off.
 ## Controls (monitor screen)
 
 - **Up** – episode history
-- **Down** – settings (background monitor, alerts, sensitivity, thresholds, sample rate, about/safety)
+- **Down** – settings (background monitor, alerts, notification, sensitivity, thresholds, sample rate, about/safety)
 - **Select** – cycle sample rate (Auto → 1s → 2s → 5s → 10s)
 
 ### Settings menu

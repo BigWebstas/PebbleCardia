@@ -10,12 +10,23 @@
 // closed. AppMessage has a single outbox slot, so send one per outbox_sent.
 static int s_dump_next = -1;   // -1 = idle, else next episode index to send
 
+// A pending "post a notification" request. The background worker launches the
+// app on an episode, so the first send often races the phone JS starting up -
+// keep the episode and retry on outbox_failed and when the JS checks in.
+static Episode   s_notify_ep;
+static bool      s_notify_pending;
+static bool      s_notify_inflight;   // our send is the one awaiting sent/failed
+static uint8_t   s_notify_tries;
+static AppTimer *s_notify_timer;
+#define NOTIFY_MAX_TRIES 6
+
 static bool begin(DictionaryIterator **iter) {
   return app_message_outbox_begin(iter) == APP_MSG_OK;
 }
 
-static void write_episode(DictionaryIterator *it, const Episode *ep, bool ongoing) {
-  dict_write_uint8(it, MESSAGE_KEY_MSG_KIND, MSG_KIND_EPISODE);
+static void write_episode(DictionaryIterator *it, const Episode *ep, bool ongoing,
+                          uint8_t kind) {
+  dict_write_uint8(it, MESSAGE_KEY_MSG_KIND, kind);
   dict_write_uint32(it, MESSAGE_KEY_EP_START, ep->start);
   dict_write_uint16(it, MESSAGE_KEY_EP_DURATION, ep->duration_s);
   dict_write_uint8(it, MESSAGE_KEY_EP_ONGOING, ongoing ? 1 : 0);
@@ -31,17 +42,36 @@ static void dump_pump(void) {
   const Episode *ep = episodes_get(s_dump_next);
   DictionaryIterator *it;
   if (ep && begin(&it)) {
-    write_episode(it, ep, false);
+    write_episode(it, ep, false, MSG_KIND_EPISODE);
     app_message_outbox_send();
     s_dump_next++;
   }
   // if begin() failed we retry on the next outbox_sent/failed callback
 }
 
+static void notify_pump(void *ctx) {
+  s_notify_timer = NULL;
+  if (!s_notify_pending) return;
+  DictionaryIterator *it;
+  if (begin(&it)) {
+    write_episode(it, &s_notify_ep, true, MSG_KIND_NOTIFY);
+    s_notify_inflight = true;
+    app_message_outbox_send();     // cleared / retried in outbox_sent / _failed
+  } else if (++s_notify_tries < NOTIFY_MAX_TRIES) {
+    s_notify_timer = app_timer_register(2000, notify_pump, NULL);
+  } else {
+    s_notify_pending = false;
+  }
+}
+
 static void inbox_received(DictionaryIterator *iter, void *ctx) {
   if (dict_find(iter, MESSAGE_KEY_DUMP)) {
     s_dump_next = 0;
     dump_pump();
+    // The JS just checked in, so it's up now - flush a queued notification.
+    if (s_notify_pending && !s_notify_inflight && !s_notify_timer) {
+      s_notify_timer = app_timer_register(500, notify_pump, NULL);
+    }
   }
 #ifdef CARDIA_DEBUG
   // pebble send-app-message --phone <ip> --int 10013=<n>
@@ -60,11 +90,23 @@ static void inbox_received(DictionaryIterator *iter, void *ctx) {
 }
 
 static void outbox_sent(DictionaryIterator *iter, void *ctx) {
+  if (s_notify_inflight) {
+    s_notify_inflight = false;
+    s_notify_pending = false;      // delivered
+  }
   dump_pump();
 }
 
 static void outbox_failed(DictionaryIterator *iter, AppMessageResult reason, void *ctx) {
   APP_LOG(APP_LOG_LEVEL_WARNING, "AppMessage outbox failed: 0x%x", reason);
+  if (s_notify_inflight) {
+    s_notify_inflight = false;
+    if (!s_notify_timer && ++s_notify_tries < NOTIFY_MAX_TRIES) {
+      s_notify_timer = app_timer_register(3000, notify_pump, NULL);
+    } else if (s_notify_tries >= NOTIFY_MAX_TRIES) {
+      s_notify_pending = false;
+    }
+  }
   dump_pump();   // retry the current dump item
 }
 
@@ -97,6 +139,17 @@ void comm_send_status(const MonitorSnapshot *snap) {
 void comm_send_episode(const Episode *ep, bool ongoing) {
   DictionaryIterator *it;
   if (!begin(&it)) return;
-  write_episode(it, ep, ongoing);
+  write_episode(it, ep, ongoing, MSG_KIND_EPISODE);
   app_message_outbox_send();
+}
+
+void comm_send_notify(const Episode *ep) {
+  s_notify_ep = *ep;
+  s_notify_pending = true;
+  s_notify_inflight = false;
+  s_notify_tries = 0;
+  if (s_notify_timer) app_timer_cancel(s_notify_timer);
+  // Small delay so an episode-open message sent alongside this clears the
+  // single outbox slot first, and so a just-launched app gives the JS a moment.
+  s_notify_timer = app_timer_register(400, notify_pump, NULL);
 }

@@ -53,6 +53,7 @@
 
 // --- Defaults (user-adjustable in Settings) --------------------------------
 #define DEF_ALERTS_ON       true
+#define DEF_NOTIFY_ON       true    // post a watch notification on a new episode
 #define DEF_SENSITIVITY     1       // 0 = low, 1 = medium, 2 = high
 #define DEF_TACHY_BPM       120     // sustained resting rate at/above -> Elevated
 #define DEF_BRADY_BPM       45      // sustained rate at/below       -> Low
@@ -72,6 +73,7 @@ static const uint8_t SENS_SCORE_THRESHOLD[3] = { 75, 60, 45 };
 // --- AppMessage MSG_KIND (watch -> phone) -------------------------------
 #define MSG_KIND_STATUS      0
 #define MSG_KIND_EPISODE     1
+#define MSG_KIND_NOTIFY      2   // ask pkjs to post a watch notification for an episode
 
 // --- Worker <-> app messages (app_worker_send_message type codes) ----------
 #define WMSG_SNAPSHOT        0   // worker -> app: packed MonitorSnapshot

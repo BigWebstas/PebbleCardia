@@ -32,9 +32,14 @@ static void vibe_alert(void) {
   vibes_enqueue_custom_pattern(pat);
 }
 
-static void on_episode_open(const Episode *ep) {
+static void alert_on_episode(const Episode *ep) {
   vibe_alert();
   comm_send_episode(ep, true);
+  if (settings_get()->notify_on) comm_send_notify(ep);
+}
+
+static void on_episode_open(const Episode *ep) {
+  alert_on_episode(ep);
 }
 
 static void on_episode_close(const Episode *ep) {
@@ -70,8 +75,7 @@ static void worker_message(uint16_t type, AppWorkerMessage *data) {
       s_snap.episode_active = true;
       s_snap.episode_type = ep.type;
       s_snap.episode_start = time(NULL);
-      vibe_alert();
-      comm_send_episode(&ep, true);
+      alert_on_episode(&ep);
       if (s_handler) s_handler(&s_snap);
       break;
     }

@@ -4,7 +4,7 @@
 #include "../settings.h"
 #include "../monitor.h"
 
-enum { ROW_BACKGROUND, ROW_ALERTS, ROW_SENS, ROW_TACHY, ROW_BRADY, ROW_RATE, ROW_ABOUT, ROW_COUNT };
+enum { ROW_BACKGROUND, ROW_ALERTS, ROW_NOTIFY, ROW_SENS, ROW_TACHY, ROW_BRADY, ROW_RATE, ROW_ABOUT, ROW_COUNT };
 
 #define COL_BG        GColorBlack
 #define COL_HILITE    GColorFolly
@@ -31,8 +31,11 @@ static const char s_about_body[] =
   "Faster sampling uses more battery. 'Auto' lets the system pace the heart "
   "rate but still keeps beat intervals coming for rhythm analysis.\n\n"
   "Background monitor: when on, a worker keeps monitoring after you leave the "
-  "app and across reboots, and launches the app to alert you. When off, "
-  "monitoring only runs while the app is open.\n\n"
+  "app and across reboots. On an episode it launches the app to alert you. "
+  "When off, monitoring only runs while the app is open.\n\n"
+  "Alerts vibrate the watch and show the rhythm screen. Notification posts a "
+  "card to the watch's notification feed (and the phone) that stays until you "
+  "dismiss it. Either can be turned off independently.\n\n"
   "The optical sensor's beat-to-beat data is noisy. Cardia rejects "
   "implausible intervals and stays quiet when the signal is poor, so a real "
   "irregular-rhythm flag needs a clean reading held for ~25 s.";
@@ -82,8 +85,12 @@ static void draw_row(GContext *ctx, const Layer *cell, MenuIndex *idx, void *c) 
       break;
     }
     case ROW_ALERTS:
-      row(ctx, cell, "Alerts", cfg->alerts_on ? "On" : "Off",
+      row(ctx, cell, "Alerts", cfg->alerts_on ? "Vibrate + screen" : "Off",
           cfg->alerts_on ? COL_ON : COL_OFF);
+      break;
+    case ROW_NOTIFY:
+      row(ctx, cell, "Notification", cfg->notify_on ? "On" : "Off",
+          cfg->notify_on ? COL_ON : COL_OFF);
       break;
     case ROW_SENS:
       row(ctx, cell, "Sensitivity", settings_sensitivity_name(), COL_ACCENT);
@@ -150,6 +157,7 @@ static void select_click(MenuLayer *m, MenuIndex *idx, void *ctx) {
       return;
     }
     case ROW_ALERTS: settings_toggle_alerts(); break;
+    case ROW_NOTIFY: settings_toggle_notify(); break;
     case ROW_SENS:   settings_cycle_sensitivity(); break;
     case ROW_TACHY:  settings_cycle_tachy(); break;
     case ROW_BRADY:  settings_cycle_brady(); break;

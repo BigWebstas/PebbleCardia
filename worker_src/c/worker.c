@@ -25,8 +25,9 @@ static void episode_open(const Episode *ep) {
   wire_pack_episode(ep, &m);
   app_worker_send_message(WMSG_EPISODE_OPEN, &m);
 
-  if (settings_get()->alerts_on) {
-    // Record it and bring the app to the foreground to alert the user.
+  if (settings_get()->alerts_on || settings_get()->notify_on) {
+    // Record it and bring the app up: it shows the alert screen and/or asks
+    // pkjs to post a watch notification (the worker can't do either itself).
     persist_write_data(PKEY_PENDING_ALERT, ep, sizeof(*ep));
     worker_launch_app();
   }

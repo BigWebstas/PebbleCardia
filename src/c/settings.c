@@ -6,6 +6,7 @@ static Settings s_settings;
 void settings_load(void) {
   s_settings = (Settings){
     .alerts_on = DEF_ALERTS_ON,
+    .notify_on = DEF_NOTIFY_ON,
     .sensitivity = DEF_SENSITIVITY,
     .tachy_bpm = DEF_TACHY_BPM,
     .brady_bpm = DEF_BRADY_BPM,
@@ -32,6 +33,8 @@ void settings_save(void) {
 Settings *settings_get(void) { return &s_settings; }
 
 void settings_toggle_alerts(void) { s_settings.alerts_on = !s_settings.alerts_on; }
+
+void settings_toggle_notify(void) { s_settings.notify_on = !s_settings.notify_on; }
 
 void settings_cycle_sensitivity(void) {
   s_settings.sensitivity = (s_settings.sensitivity + 1) % 3;
