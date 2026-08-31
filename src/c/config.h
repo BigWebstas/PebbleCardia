@@ -21,10 +21,9 @@
 #endif
 
 // --- Ring buffers -------------------------------------------------------------
-// The worker runs in 12 KB of RAM, so it keeps a smaller beat-interval window.
-// The BPM graph ring is just a byte per sample now, so both keep the full 180
-// - the worker persists it (PKEY_BPM_HISTORY) so the app's graph survives
-// leaving/returning while the worker runs.
+// The worker's 12 KB RAM budget keeps a smaller beat-interval window. Both keep
+// the full 180-sample BPM ring (one byte each); the worker persists it
+// (PKEY_BPM_HISTORY) so the app's graph survives leaving and returning.
 #define BPM_BUF_LEN          180
 #if defined(CARDIA_WORKER)
 #define RR_BUF_LEN           72

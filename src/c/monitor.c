@@ -137,11 +137,9 @@ void monitor_deinit(void) {
 }
 
 void monitor_start(void) {
-  // When background mode is on the worker owns the engine and the app ONLY
-  // renders its stream - never its own engine, or the two would both subscribe
-  // the shared HRM session and crash. If the worker isn't up yet (e.g. just
-  // after an install, before worker_manager relaunches it) make sure it starts,
-  // then attach and wait for its first snapshot.
+  // Background mode: the worker owns the engine, the app only renders its stream
+  // - running both would double-subscribe the shared HRM session and crash.
+  // Launch the worker if it isn't up yet, then attach.
   if (settings_get()->background_on) {
     if (!app_worker_is_running()) app_worker_launch();
     go_attached();

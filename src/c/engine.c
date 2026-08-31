@@ -123,8 +123,8 @@ static bool is_abnormal(RhythmStatus s) {
   return s == RHYTHM_ELEVATED || s == RHYTHM_LOW || s == RHYTHM_IRREGULAR;
 }
 
-// --- BPM graph history: persisted so the graph survives the app being closed
-//     (especially in background mode, where the worker owns the real history) --
+// BPM graph history, persisted so the graph survives the app closing (in
+// background mode the worker owns the real history).
 static void bpm_history_load(void) {
   static uint8_t buf[BPM_BUF_LEN];
   if (!persist_exists(PKEY_BPM_HISTORY)) return;
@@ -210,15 +210,14 @@ static void tick(void *context) {
 }
 
 #ifdef CARDIA_DEBUG
-// Feed a burst of synthetic, irregularly-irregular beat intervals so the full
-// IRREGULAR -> episode -> alert -> history -> phone path can be exercised on
-// hardware without waiting for a real arrhythmia. Also injects a plausible bpm
-// so the "no signal" gate passes. Local (in-app) engine only.
+// Feed synthetic irregularly-irregular beat intervals so the full IRREGULAR ->
+// episode -> alert -> history -> phone path can be tested on hardware without a
+// real arrhythmia. Local (in-app) engine only.
 void engine_debug_inject_irregular(void) {
   time_t now = time(NULL);
-  // Inject a bpm first so the artifact cross-check accepts the intervals, then
-  // an irregularly-irregular stream that stays inside the plausible window
-  // (~90 bpm, +/-180 ms) so signal quality stays high and it classifies.
+  // bpm first so the artifact cross-check accepts the intervals, then an
+  // irregular stream inside the plausible window (~90 bpm, +/-180 ms) so signal
+  // quality stays high.
   analysis_add_bpm(90, now);
   uint32_t seed = (uint32_t)now;
   for (int i = 0; i < 45; i++) {

@@ -147,9 +147,9 @@ bool analysis_compute(time_t now, AnalysisResult *out) {
   r.hr_from_rr = (uint8_t)(mean ? (60000 / mean) : 0);
 
   // --- irregularity score ------------------------------------------------
-  // Sinus rhythm at rest: RMSSD ~20-60 ms, pNN50 well under 20%, CV under ~8%.
-  // An irregularly-irregular rhythm pushes all three up together, and the
-  // successive differences change sign nearly every beat (low autocorrelation).
+  // Resting sinus rhythm: RMSSD ~20-60 ms, pNN50 < 20%, CV < ~8%. An
+  // irregularly-irregular rhythm pushes all three up and flips the successive
+  // differences' sign nearly every beat.
   int32_t score = r.pnn50_pct;                       // 0..100
   if (r.rmssd_ms > 80)  score += (r.rmssd_ms - 80) / 3;
   if (r.cv_pct   > 10)  score += (r.cv_pct - 10) * 2;
