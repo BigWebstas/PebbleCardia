@@ -6,6 +6,9 @@
 # Node
 /node_modules/
 
+# IDE
+/.idea/
+
 # scratch
 scratchpad_logs.txt
 wear_capture.txt
