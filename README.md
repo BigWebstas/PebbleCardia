@@ -31,6 +31,7 @@ watches whose SDK exposes beat-to-beat intervals.
 - **Export:** the config page builds a Markdown report with charts. The watch's
   config view can't save files, so it's copy-to-clipboard — paste into Joplin,
   Obsidian, etc. `tools/report-viewer.html`, hosted, gives working Save/Share.
+  The config page follows the phone's light/dark system theme.
 
 ## Controls
 

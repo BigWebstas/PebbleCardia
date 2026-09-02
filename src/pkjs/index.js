@@ -364,23 +364,29 @@ Pebble.addEventListener('showConfiguration', function () {
 '<title>Cardia report</title>' +
 '<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>' +
 '<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>' +
-'<meta name="color-scheme" content="light only">' +
+'<meta name="color-scheme" content="light dark">' +
 '<style>' +
-':root{color-scheme:light}' +
-'html,body{background:#fff;color:#111}' +
+':root{color-scheme:light dark;' +
+'--bg:#fff;--fg:#111;--hint:#666;--field-bg:#fff;--field-border:#ccc;' +
+'--ctl-border:#999;--bar-border:#eee;--accent:#2b6cb0;--accent-fg:#fff;--danger:#c53030}' +
+'@media (prefers-color-scheme:dark){:root{' +
+'--bg:#1c1c1e;--fg:#e6e6e9;--hint:#9a9aa0;--field-bg:#2c2c2e;--field-border:#48484a;' +
+'--ctl-border:#5a5a5e;--bar-border:#333;--accent:#3b82c4;--accent-fg:#fff;--danger:#e05555}}' +
+'html,body{background:var(--bg);color:var(--fg)}' +
 'body{font:15px/1.5 -apple-system,Roboto,sans-serif;margin:0;padding:16px;max-width:820px}' +
 'h1{font-size:20px}h2{font-size:16px;margin-top:24px}' +
-'button,input,.btn{font:14px inherit;padding:9px 12px;margin:4px 4px 4px 0;border:1px solid #999;border-radius:8px;background:#fff;color:#111}' +
-'button,.btn{background:#2b6cb0;color:#fff;border-color:#2b6cb0;text-decoration:none;display:inline-block;cursor:pointer}' +
-'input{min-width:60%}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:3px 8px}' +
-'#raw{width:100%;height:180px;font:12px monospace;background:#fff;color:#111}.mermaid{overflow-x:auto;background:#fff}' +
-'.bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #eee}' +
-'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:#666;font-size:13px}' +
+'button,input,.btn{font:14px inherit;padding:9px 12px;margin:4px 4px 4px 0;border:1px solid var(--ctl-border);border-radius:8px;background:var(--field-bg);color:var(--fg)}' +
+'button,.btn{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);text-decoration:none;display:inline-block;cursor:pointer}' +
+'button.danger{background:var(--danger);border-color:var(--danger)}' +
+'input{min-width:60%;background:var(--field-bg);color:var(--fg);border-color:var(--field-border)}table{border-collapse:collapse}td,th{border:1px solid var(--field-border);padding:3px 8px}' +
+'#raw{width:100%;height:180px;font:12px monospace;background:var(--field-bg);color:var(--fg);border:1px solid var(--field-border)}.mermaid{overflow-x:auto;background:var(--bg)}' +
+'.bar{position:sticky;top:0;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--bar-border)}' +
+'label{display:block;margin:10px 0 2px;font-weight:bold}.hint{color:var(--hint);font-size:13px}' +
 '</style></head><body>' +
 '<div class="bar">' +
 '<button onclick="cp(\'md\')">Copy Markdown</button>' +
 '<button onclick="cp(\'json\')">Copy JSON</button>' +
-'<button onclick="clearData()" style="background:#c53030;border-color:#c53030">Clear</button>' +
+'<button class="danger" onclick="clearData()">Clear</button>' +
 '</div>' +
 '<div id="msg" class="hint"></div>' +
 '<p class="hint">This settings screen can\'t save files. <b>Copy Markdown</b> ' +
@@ -415,7 +421,8 @@ Pebble.addEventListener('showConfiguration', function () {
 'function done(){location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({' +
 '  syncUrl:g("url").value.trim()}));}' +
 'try{' +
-'  mermaid.initialize({startOnLoad:false,theme:"neutral"});' +
+'  var dark=window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;' +
+'  mermaid.initialize({startOnLoad:false,theme:dark?"dark":"neutral"});' +
 '  var html=marked.parse(MD);' +
 '  html=html.replace(/<pre><code class="language-mermaid[^"]*">([\\s\\S]*?)<\\/code><\\/pre>/g,' +
 '    function(_,c){return \'<pre class="mermaid">\'+c.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&quot;/g,\'"\')+\'</pre>\';});' +
