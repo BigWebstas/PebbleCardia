@@ -50,6 +50,9 @@
 #endif
 #define TICK_MS             3000    // engine re-classifies this often
 
+// --- Launcher glance ---------------------------------------------------
+#define GLANCE_EXPIRY_S    21600    // drop the "last BPM" subtitle after 6 h
+
 // --- Defaults (user-adjustable in Settings) --------------------------------
 #define DEF_ALERTS_ON       true
 #define DEF_NOTIFY_ON       true    // post a watch notification on a new episode

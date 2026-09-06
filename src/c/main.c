@@ -4,6 +4,7 @@
 #include "episodes.h"
 #include "comm.h"
 #include "monitor.h"
+#include "glance.h"
 #include "windows/win_monitor.h"
 #include "windows/win_alert.h"
 
@@ -26,6 +27,11 @@ static void init(void) {
 }
 
 static void deinit(void) {
+  // Leave the last reading on the launcher glance before the engine stops.
+  MonitorSnapshot snap;
+  monitor_get_snapshot(&snap);
+  glance_update(&snap);
+
   monitor_deinit();
   comm_deinit();
   settings_save();

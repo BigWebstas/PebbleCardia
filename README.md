@@ -25,6 +25,9 @@ watches whose SDK exposes beat-to-beat intervals.
 - **Background monitor (optional):** a PebbleOS worker runs the same engine
   continuously, so monitoring keeps going after you leave the app and survives a
   reboot. Costs more battery.
+- **Launcher glance:** leaving the app writes the last reading to the app's
+  launcher subtitle ("72 BPM · 4 sec ago"), which ages on its own and clears
+  after 6 h.
 - **Phone log:** the companion JS keeps a rolling log of samples and episodes and
   can `POST` each one to a sync URL you set (`tools/cardia-sheet-sync.gs` appends
   them to a Google Sheet).
