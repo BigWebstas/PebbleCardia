@@ -9,7 +9,7 @@
 // prompt to pay attention and, if it repeats, to see a clinician.
 // ---------------------------------------------------------------------------
 
-#define APP_VERSION "1.1.0"
+#define APP_VERSION "1.2.0"
 
 // Set to 1 for on-watch debug logging, shortened episode timings, and the
 // synthetic-arrhythmia injector (long-press SELECT, or AppMessage key
