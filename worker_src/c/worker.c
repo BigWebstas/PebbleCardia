@@ -1,3 +1,11 @@
+// The build normally passes -DCARDIA_WORKER for every worker translation unit
+// (see wscript). Define it here too so the entry point still selects
+// <pebble_worker.h> when a build service regenerates the wscript without it -
+// worker_event_loop() / worker_launch_app() live only in that header.
+#ifndef CARDIA_WORKER
+#define CARDIA_WORKER 1
+#endif
+
 #include "../../src/c/platform.h"      // -> <pebble_worker.h>
 #include "../../src/c/config.h"
 #include "../../src/c/settings.h"
