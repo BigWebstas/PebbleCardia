@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="320" viewBox="0 0 720 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#181b21"/>
+      <stop offset="1" stop-color="#0b0c0f"/>
+    </linearGradient>
+    <radialGradient id="vig" cx="0.32" cy="0.4" r="0.9">
+      <stop offset="0" stop-color="#20242c" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-80%" width="140%" height="260%">
+      <feGaussianBlur stdDeviation="2.4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="720" height="320" fill="url(#bg)"/>
+  <rect width="720" height="320" fill="url(#vig)"/>
+
+  <g transform="translate(602,150) scale(3.0)" fill="#ff453a" opacity="0.08">
+    <path d="M 0,6 C 0,2 -4,-4 -11,-4 C -20,-4 -26,3 -26,12 C -26,26 -12,38 0,48 C 12,38 26,26 26,12 C 26,3 20,-4 11,-4 C 4,-4 0,2 0,6 Z"/>
+  </g>
+
+  <path d="M -20,264 L 40,264 L 56,264 L 64,254 L 72,264 L 88,264 L 93,274 L 98,212 L 104,284 L 110,264 L 126,264 L 134,248 L 142,264 L 152,264 L 168,264 L 176,254 L 184,264 L 200,264 L 205,274 L 210,212 L 216,284 L 222,264 L 238,264 L 246,248 L 254,264 L 264,264 L 280,264 L 288,254 L 296,264 L 312,264 L 317,274 L 322,214 L 328,284 L 334,264 L 350,264 L 358,248 L 366,264 L 376,264 L 392,264 L 400,254 L 408,264 L 424,264 L 429,274 L 434,224 L 440,284 L 446,264 L 462,264 L 470,248 L 478,264 L 448,264 L 464,264 L 472,254 L 480,264 L 496,264 L 501,274 L 506,204 L 512,284 L 518,264 L 534,264 L 542,248 L 550,264 L 582,264 L 598,264 L 606,254 L 614,264 L 630,264 L 635,274 L 640,231 L 646,284 L 652,264 L 668,264 L 676,248 L 684,264 L 646,264 L 662,264 L 670,254 L 678,264 L 694,264 L 699,274 L 704,208 L 710,284 L 716,264 L 732,264 L 740,248 L 748,264 L 796,264 L 812,264 L 820,254 L 828,264 L 844,264 L 849,274 L 854,212 L 860,284 L 866,264 L 882,264 L 890,248 L 898,264 L 908,264 L 924,264 L 932,254 L 940,264 L 956,264 L 961,274 L 966,212 L 972,284 L 978,264 L 994,264 L 1002,248 L 1010,264 L 1020,264 L 1036,264 L 1044,254 L 1052,264 L 1068,264 L 1073,274 L 1078,214 L 1084,284 L 1090,264 L 1106,264 L 1114,248 L 1122,264 L 740,264" fill="none" stroke="#ff453a" stroke-width="2.6"
+        stroke-linejoin="round" stroke-linecap="round" opacity="0.22"/>
+  <path d="M -20,264 L 40,264 L 56,264 L 64,254 L 72,264 L 88,264 L 93,274 L 98,212 L 104,284 L 110,264 L 126,264 L 134,248 L 142,264 L 152,264 L 168,264 L 176,254 L 184,264 L 200,264 L 205,274 L 210,212 L 216,284 L 222,264 L 238,264 L 246,248 L 254,264 L 264,264 L 280,264 L 288,254 L 296,264 L 312,264 L 317,274 L 322,214 L 328,284 L 334,264 L 350,264 L 358,248 L 366,264 L 376,264 L 392,264 L 400,254 L 408,264 L 424,264 L 429,274 L 434,224 L 440,284 L 446,264 L 462,264 L 470,248 L 478,264 L 448,264 L 464,264 L 472,254 L 480,264 L 496,264 L 501,274 L 506,204 L 512,284 L 518,264 L 534,264 L 542,248 L 550,264 L 582,264 L 598,264 L 606,254 L 614,264 L 630,264 L 635,274 L 640,231 L 646,284 L 652,264 L 668,264 L 676,248 L 684,264 L 646,264 L 662,264 L 670,254 L 678,264 L 694,264 L 699,274 L 704,208 L 710,284 L 716,264 L 732,264 L 740,248 L 748,264 L 796,264 L 812,264 L 820,254 L 828,264 L 844,264 L 849,274 L 854,212 L 860,284 L 866,264 L 882,264 L 890,248 L 898,264 L 908,264 L 924,264 L 932,254 L 940,264 L 956,264 L 961,274 L 966,212 L 972,284 L 978,264 L 994,264 L 1002,248 L 1010,264 L 1020,264 L 1036,264 L 1044,254 L 1052,264 L 1068,264 L 1073,274 L 1078,214 L 1084,284 L 1090,264 L 1106,264 L 1114,248 L 1122,264 L 740,264" fill="none" stroke="#ff453a" stroke-width="1.9"
+        stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+
+  <g font-family="DejaVu Sans, sans-serif">
+    <text x="56" y="132" font-size="82" font-weight="bold" fill="#ffffff"
+          letter-spacing="-1">Cardia</text>
+    <text x="59" y="170" font-size="22" fill="#9aa0a8">A closer watch on your heart rhythm</text>
+    <text x="60" y="205" font-size="14" fill="#c92f27" letter-spacing="2.5"
+          font-weight="bold">SUSTAINED HIGH  <tspan fill="#5f6670">&#183;</tspan>  SUSTAINED LOW  <tspan fill="#5f6670">&#183;</tspan>  IRREGULAR RHYTHM</text>
+    <text x="664" y="300" font-size="13" fill="#5b616b" text-anchor="end">PebbleOS &#183; not a medical device</text>
+  </g>
+</svg>
