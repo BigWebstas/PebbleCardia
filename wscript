@@ -6,14 +6,12 @@ import os.path
 top = '.'
 out = 'build'
 
-# Code shared by the foreground app and the background worker. Compiled into
-# both; the worker copies are built with -DCARDIA_WORKER (see platform.h).
-SHARED_SOURCES = [
-    'src/c/analysis.c',
-    'src/c/episodes.c',
-    'src/c/settings.c',
-    'src/c/engine.c',
-]
+# The engine/analysis/episode/settings code is shared by the app and the
+# background worker. The app compiles it straight from src/c/. The worker pulls
+# the same files in through thin shims in worker_src/c/_shared_*.c, each of
+# which #defines CARDIA_WORKER (-> <pebble_worker.h>, smaller ring buffers).
+# Shims rather than a wscript source list because the appstore build service
+# regenerates this wscript and only globs worker_src/ for the worker.
 
 
 def options(ctx):
@@ -42,13 +40,7 @@ def build(ctx):
 
         if build_worker:
             worker_elf = '{}/pebble-worker.elf'.format(ctx.env.BUILD_DIR)
-            worker_src = ctx.path.ant_glob('worker_src/c/**/*.c') + \
-                [ctx.path.find_node(s) for s in SHARED_SOURCES]
-            # The shared sources need <pebble_worker.h> and the smaller worker
-            # ring buffers here (see platform.h / config.h). worker.c defines
-            # CARDIA_WORKER itself so the entry point still builds under a
-            # build service that regenerates this wscript and drops the define.
-            ctx.pbl_build(source=worker_src,
+            ctx.pbl_build(source=ctx.path.ant_glob('worker_src/c/**/*.c'),
                           target=worker_elf,
                           bin_type='worker',
                           defines=['CARDIA_WORKER'])
