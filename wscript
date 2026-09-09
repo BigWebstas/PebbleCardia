@@ -44,16 +44,19 @@ def build(ctx):
             worker_elf = '{}/pebble-worker.elf'.format(ctx.env.BUILD_DIR)
             worker_src = ctx.path.ant_glob('worker_src/c/**/*.c') + \
                 [ctx.path.find_node(s) for s in SHARED_SOURCES]
-            # -DCARDIA_WORKER switches platform.h to <pebble_worker.h>. Pass it
-            # as both a waf `define` and a raw `cflag`: some pebble-sdk docker
-            # images ship a waflib that drops the `defines=` kwarg on the worker
-            # task, which silently builds worker.c against <pebble.h> and fails
-            # on worker_event_loop() / worker_launch_app().
+            # -DCARDIA_WORKER switches platform.h to <pebble_worker.h>. Inject it
+            # through a derived env rather than a defines=/cflags= kwarg: some
+            # pebble-sdk waf builds silently drop those kwargs on the worker
+            # target, which builds worker.c against <pebble.h> and fails on
+            # worker_event_loop() / worker_launch_app(). The env swap is the same
+            # mechanism this loop already uses to select the platform.
+            app_env = ctx.env
+            ctx.env = app_env.derive()
+            ctx.env.append_value('DEFINES', 'CARDIA_WORKER')
             ctx.pbl_build(source=worker_src,
                           target=worker_elf,
-                          bin_type='worker',
-                          defines=['CARDIA_WORKER'],
-                          cflags=['-DCARDIA_WORKER'])
+                          bin_type='worker')
+            ctx.env = app_env
             binaries.append({'platform': platform,
                              'app_elf': app_elf,
                              'worker_elf': worker_elf})
