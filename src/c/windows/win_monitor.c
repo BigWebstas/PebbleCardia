@@ -25,8 +25,9 @@ static void update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, b, 0, GCornerNone);
 
-  const int pad = 6;
-  int y = pad;
+  // Round (gabbro) needs a wider margin so the curved bezel doesn't clip text.
+  const int pad = PBL_IF_ROUND_ELSE(22, 6);
+  int y = PBL_IF_ROUND_ELSE(30, pad);
 
   // --- big heart rate ------------------------------------------------
   if (snap.bpm > 0) snprintf(s_bpm_text, sizeof(s_bpm_text), "%u", snap.bpm);
@@ -102,14 +103,15 @@ static void update_proc(Layer *layer, GContext *ctx) {
     snprintf(s_metrics_text, sizeof(s_metrics_text), "collecting beats  n%u", snap.n_intervals);
   }
   graphics_context_set_text_color(ctx, GColorLightGray);
+  int footer_y = b.size.h - PBL_IF_ROUND_ELSE(34, 20);
   graphics_draw_text(ctx, s_metrics_text, fonts_get_system_font(FONT_KEY_GOTHIC_14),
-                     GRect(pad, b.size.h - 20, b.size.w - 2 * pad, 18),
+                     GRect(pad, footer_y, b.size.w - 2 * pad, 18),
                      GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 
   // motion dot
   if (snap.motion > 40) {
     graphics_context_set_fill_color(ctx, GColorChromeYellow);
-    graphics_fill_circle(ctx, GPoint(b.size.w - pad - 4, b.size.h - 11), 4);
+    graphics_fill_circle(ctx, GPoint(b.size.w - pad - 4, footer_y + 9), 4);
   }
 }
 

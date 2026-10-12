@@ -40,6 +40,10 @@ static void window_load(Window *w) {
 
   scroll_layer_add_child(s_scroll, text_layer_get_layer(s_text));
   layer_add_child(root, scroll_layer_get_layer(s_scroll));
+
+#ifdef PBL_ROUND
+  text_layer_enable_screen_text_flow_and_paging(s_text, 5);
+#endif
 }
 
 static void window_unload(Window *w) {

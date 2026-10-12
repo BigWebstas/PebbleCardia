@@ -131,6 +131,9 @@ static void about_load(Window *w) {
   layer_add_child(root, scroll_layer_get_layer(sl));
   layer_set_hidden((Layer *)sl, false);
   window_set_user_data(w, sl);
+#ifdef PBL_ROUND
+  text_layer_enable_screen_text_flow_and_paging(s_about_text, 5);
+#endif
 }
 
 static void about_unload(Window *w) {
